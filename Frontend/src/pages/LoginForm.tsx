@@ -105,7 +105,7 @@ const LoginForm = () => {
               username: validateUsername(newValue),
             }));
           }}
-          label="Nombre de usuario"
+          label="URL Perfil Platzi"
           error={error.username}
         />
         <InputField
