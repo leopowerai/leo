@@ -3,10 +3,10 @@ import datetime
 from notion_client import Client
 
 # Initialize the Notion client
-notion = Client(auth="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")
+notion = Client(auth="<API_Key>")
 
 # Replace with your database ID (you can get this from the Notion board URL)
-DATABASE_ID = "12e3386028bd817abbb5d696d604fa17"
+DATABASE_ID = "<DATABASE_ID>"
 
 
 # 1. Create a new task
