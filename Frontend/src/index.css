@@ -1,33 +1,46 @@
 :root {
-    --primary-color: #13161c;
-    --secondary-color: #1f2937;
-    --input-bg: rgba(0, 0, 0, 0.3);
-  }
-  
-  .bg-primary {
-    background-color: var(--primary-color);
-  }
-  
-  .bg-secondary {
-    background-color: var(--secondary-color);
-  }
-  
-  .bg-input {
-    background-color: var(--input-bg);
-  }
-  
-  /* Styles for input label inside the input */
-  .peer-placeholder-shown ~ label {
-    top: 3rem;
-    left: 1rem;
-  }
-  
-  .peer:focus ~ label,
-  .peer:not(:placeholder-shown) ~ label {
-    top: 1rem;
-    left: 0.3rem;
-    font-size: 0.875rem;
-    color: #c4c8ce;
-    background-color: transparent;
-    padding: 0 0.25rem;
-  }
+  --primary-color: #13161c;
+  --secondary-color: #1f2937;
+  --input-bg: rgba(0, 0, 0, 0.3);
+}
+
+.bg-primary {
+  background-color: var(--primary-color);
+}
+
+.bg-secondary {
+  background-color: var(--secondary-color);
+}
+
+.bg-input {
+  background-color: var(--input-bg);
+}
+
+/* Styles for input label inside the input */
+.peer-placeholder-shown ~ label {
+  top: 3rem;
+  left: 1rem;
+}
+
+.peer:focus ~ label,
+.peer:not(:placeholder-shown) ~ label {
+  top: 1rem;
+  left: 0.3rem;
+  font-size: 0.875rem;
+  color: #ffffff;
+  background-color: transparent;
+  padding: 0 0.25rem;
+}
+
+/* Error input border styles */
+input:focus.border-red-500 {
+  border-color: #e3342f;
+}
+
+input.border-red-500 {
+  border-color: #e3342f;
+}
+
+.text-red-500 {
+  color: #e3342f;
+}
