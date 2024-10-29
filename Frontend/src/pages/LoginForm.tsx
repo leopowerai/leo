@@ -9,15 +9,7 @@ const LoginForm = () => {
   const [username, setUsername] = useState("");
   const [githubUrl, setGithubUrl] = useState("");
   const [error, setError] = useState({ username: "", githubUrl: "", form: "" });
-  const [isButtonDisabled, setIsButtonDisabled] = useState(true);
   const navigate = useNavigate();
-
-  useEffect(() => {
-    // Verifica si hay errores o campos vacíos para habilitar/deshabilitar el botón
-    setIsButtonDisabled(
-      !!error.username || !!error.githubUrl || !username || !githubUrl
-    );
-  }, [error, username, githubUrl]);
 
   const validateUsername = (username) => {
     const usernameRegex = /^[a-zA-Z0-9_-]{1,39}$/;
@@ -41,7 +33,7 @@ const LoginForm = () => {
     return "";
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     const newError = { username: "", githubUrl: "", form: "" };
     let hasError = false;
@@ -126,7 +118,7 @@ const LoginForm = () => {
         {error.form && (
           <p className="text-red-500 text-sm mt-1 text-center">{error.form}</p>
         )}
-        <Button type="submit" className="w-full p-3 mt-4" disabled={isButtonDisabled}>
+        <Button type="submit" className="w-full p-3 mt-4">
           Aceptar
         </Button>
       </form>
