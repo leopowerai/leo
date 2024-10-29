@@ -1,5 +1,5 @@
 import LoginForm from './pages/LoginForm';
-import PlatziLeo from './assets/PlatziLeo.svg';
+import PlatziLeo from './assets/LeoPlatzi.svg';
 import './App.css'
 
 function App() {
