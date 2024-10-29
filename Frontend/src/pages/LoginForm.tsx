@@ -30,6 +30,7 @@ const LoginForm = () => {
   const [username, setUsername] = useState('');
   const [githubUrl, setGithubUrl] = useState('');
   const [error, setError] = useState<ErrorState>({});
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -46,10 +47,13 @@ const LoginForm = () => {
 
     if (hasError) return;
 
+    setLoading(true);
+
     try {
       await submitForm({ username, githubUrl });
       localStorage.setItem('username', username);
       localStorage.setItem('githubUrl', githubUrl);
+      setLoading(false);
       navigate('/home');
     } catch (error) {
       console.error('Error submitting form:', error);
@@ -57,6 +61,7 @@ const LoginForm = () => {
         ...prevError,
         form: 'Hubo un error al enviar el formulario. Inténtalo nuevamente.',
       }));
+      setLoading(false);
     }
   };
 
@@ -71,7 +76,7 @@ const LoginForm = () => {
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen w-full bg-primary">
-    <div className="mb-4" style={{ width: "350px", height: "auto" }}> {/* Ancho ajustado a 138px */}
+    <div className="mb-4" style={{ width: "350px", height: "auto" }}>
       <img src={LeoPlatziLogo} alt="Logo de LeoPlatzi" />
     </div>
       <form onSubmit={handleSubmit} className="w-96">
@@ -107,7 +112,7 @@ const LoginForm = () => {
           <p className="text-red-500 text-sm mt-1 text-center">{error.form}</p>
         )}
         <Button type="submit" className="w-full p-3 mt-4">
-          Iniciar Sesión
+        {loading ? <span className="loader-dots">Cargando...</span> : 'Aceptar'}
         </Button>
       </form>
     </div>
