@@ -32,6 +32,24 @@
   padding: 0 0.25rem;
 }
 
+/* Loader animation for button */
+.loader-dots {
+  display: inline-block;
+  animation: dots 1.5s infinite ease-in-out;
+}
+
+@keyframes dots {
+  0%{
+    color: transparent;
+  }
+  50% {
+    color: #000;
+  }
+  100% {
+    color: transparent;
+  }
+}
+
 /* Error input border styles */
 input:focus.border-red-500 {
   border-color: #e3342f;

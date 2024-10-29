@@ -1,75 +1,82 @@
-import { useState } from "react";
-import { submitForm } from "../services/api";
-import InputField from "../components/InputField";
-import Button from "../components/Button";
-import { useNavigate } from "react-router-dom";
+import { useState, useEffect } from 'react';
+import { submitForm } from '../services/api';
+import InputField from '../components/InputField';
+import Button from '../components/Button';
+import { useNavigate } from 'react-router-dom';
 import LeoPlatziLogo from "/LeoPlatzi.svg";
 
+const PLATZI_URL_REGEX = /^https:\/\/platzi\.com\/p\/[a-zA-Z0-9_-]{3,20}\/$/;
+const GITHUB_URL_REGEX = /^https:\/\/github\.com\/[a-zA-Z0-9_-]{1,39}$/;
+
+const validateUsername = (username: string): string => {
+  if (!username) return 'Este campo es obligatorio';
+  if (!PLATZI_URL_REGEX.test(username)) return 'La URL debe seguir el formato: https://platzi.com/p/usuario/';
+  return '';
+};
+
+const validateGithubUrl = (url: string): string => {
+  if (!url) return 'Este campo es obligatorio';
+  if (!GITHUB_URL_REGEX.test(url)) return 'Debe ingresar una URL válida de GitHub (https://github.com/usuario)';
+  return '';
+};
+
+interface ErrorState {
+  username?: string;
+  githubUrl?: string;
+  form?: string;
+}
 
 const LoginForm = () => {
-  const [username, setUsername] = useState("");
-  const [githubUrl, setGithubUrl] = useState("");
-  const [error, setError] = useState({ username: "", githubUrl: "", form: "" });
+  const [username, setUsername] = useState('');
+  const [githubUrl, setGithubUrl] = useState('');
+  const [error, setError] = useState<ErrorState>({});
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
-
-  const validateUsername = (username: string) => {
-    // Validar que el usuario tenga la URL de Platzi en el formato correcto
-    const platziUrlRegex = /^https:\/\/platzi\.com\/p\/[a-zA-Z0-9_-]{3,20}\/$/;
-    if (!username) {
-      return "Este campo es obligatorio";
-    }
-    if (!platziUrlRegex.test(username)) {
-      return "La URL debe seguir el formato: https://platzi.com/p/usuario/";
-    }
-    return "";
-  };
-
-  const validateGithubUrl = (url: string) => {
-    const githubUrlRegex = /^https:\/\/github\.com\/[a-zA-Z0-9_-]{1,39}$/;
-    if (!url) {
-      return "Este campo es obligatorio";
-    }
-    if (!githubUrlRegex.test(url)) {
-      return "Debe ingresar una URL válida de GitHub (https://github.com/usuario)";
-    }
-    return "";
-  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const newError = { username: "", githubUrl: "", form: "" };
-    let hasError = false;
 
-    // Validación del nombre de usuario
-    newError.username = validateUsername(username);
-    if (newError.username) hasError = true;
-
-    // Validación de la URL de GitHub
-    newError.githubUrl = validateGithubUrl(githubUrl);
-    if (newError.githubUrl) hasError = true;
+    const newError: ErrorState = {
+      username: validateUsername(username),
+      githubUrl: validateGithubUrl(githubUrl),
+    };
 
     setError(newError);
 
+    const hasError = Object.values(newError).some((err) => err);
+
     if (hasError) return;
+
+    setLoading(true);
 
     try {
       await submitForm({ username, githubUrl });
       localStorage.setItem('username', username);
       localStorage.setItem('githubUrl', githubUrl);
+      setLoading(false);
       navigate('/home');
-      
     } catch (error) {
-      console.error("Error submitting form:", error);
+      console.error('Error submitting form:', error);
       setError((prevError) => ({
         ...prevError,
-        form: "Hubo un error al enviar el formulario. Inténtalo nuevamente.",
+        form: 'Hubo un error al enviar el formulario. Inténtalo nuevamente.',
       }));
+      setLoading(false);
     }
   };
 
+  useEffect(() => {
+    const storedUsername = localStorage.getItem('username');
+    const storedGithubUrl = localStorage.getItem('githubUrl');
+    if (!storedUsername || !storedGithubUrl) {
+      localStorage.removeItem('username');
+      localStorage.removeItem('githubUrl');
+    }
+  }, []);
+
   return (
     <div className="flex flex-col items-center justify-center min-h-screen w-full bg-primary">
-    <div className="mb-4" style={{ width: "350px", height: "auto" }}> {/* Ancho ajustado a 138px */}
+    <div className="mb-4" style={{ width: "350px", height: "auto" }}>
       <img src={LeoPlatziLogo} alt="Logo de LeoPlatzi" />
     </div>
       <form onSubmit={handleSubmit} className="w-96">
@@ -78,11 +85,10 @@ const LoginForm = () => {
           type="text"
           value={username}
           onChange={(e) => {
-            const newValue = e.target.value;
-            setUsername(newValue);
+            setUsername(e.target.value);
             setError((prevError) => ({
               ...prevError,
-              username: validateUsername(newValue),
+              username: validateUsername(e.target.value),
             }));
           }}
           label="URL Perfil Platzi"
@@ -93,11 +99,10 @@ const LoginForm = () => {
           type="url"
           value={githubUrl}
           onChange={(e) => {
-            const newValue = e.target.value;
-            setGithubUrl(newValue);
+            setGithubUrl(e.target.value);
             setError((prevError) => ({
               ...prevError,
-              githubUrl: validateGithubUrl(newValue),
+              githubUrl: validateGithubUrl(e.target.value),
             }));
           }}
           label="URL Github"
@@ -107,7 +112,7 @@ const LoginForm = () => {
           <p className="text-red-500 text-sm mt-1 text-center">{error.form}</p>
         )}
         <Button type="submit" className="w-full p-3 mt-4">
-          Iniciar Sesión
+        {loading ? <span className="loader-dots">Cargando...</span> : 'Aceptar'}
         </Button>
       </form>
     </div>
