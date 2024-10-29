@@ -16,6 +16,7 @@ def submit():
     if not platzi_url or not github_url:
         return jsonify({"error": "Ambos campos son requeridos"}), 400
 
+    # HAY QUE CHECAR SI YA ESTA ASIGNADO
     try:
         # Get the projects
         project1 = Project(
@@ -49,5 +50,5 @@ def submit():
         return jsonify({"message": e}), 500
 
 
-if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000)
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", port=5000)

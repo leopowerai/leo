@@ -1,11 +1,12 @@
-from notion_client import Client
 import datetime
 
+from notion_client import Client
+
 # Initialize the Notion client
-notion = Client(auth="<INTERNAL_TOKEN>")
+notion = Client(auth="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")
 
 # Replace with your database ID (you can get this from the Notion board URL)
-DATABASE_ID = "<DATABASE_ID>"
+DATABASE_ID = "12e3386028bd817abbb5d696d604fa17"
 
 
 # 1. Create a new task
@@ -22,18 +23,17 @@ DATABASE_ID = "<DATABASE_ID>"
 #     )
 #     return response
 
+
 def create_task(description):
     # Ensure that description is provided as a list of rich text objects
-    description_property = {
-        "rich_text": [{"text": {"content": description}}]
-    }
+    description_property = {"rich_text": [{"text": {"content": description}}]}
 
     # Create the page in the specified database
     response = notion.pages.create(
         parent={"database_id": DATABASE_ID},
         properties={
             "Description": description_property  # Replace with your actual property name
-        }
+        },
     )
     return response
 
@@ -53,11 +53,13 @@ def update_task(page_id, title=None, description=None, deadline=None, tags=None)
     response = notion.pages.update(page_id=page_id, properties=properties)
     return response
 
+
 # 3. Delete a task by updating its status or using a custom delete function
 def delete_task(page_id):
     # Notion API does not support hard deletion, but you can mark it as archived
     response = notion.pages.update(page_id=page_id, archived=True)
     return response
+
 
 # Example Usage
 # Set your task parameters
