@@ -3,11 +3,13 @@ import { submitForm } from "../services/api";
 
 import InputField from "../components/InputField";
 import Button from "../components/Button";
+import { useNavigate } from "react-router-dom";
 
 const LoginForm = () => {
   const [username, setUsername] = useState("");
   const [githubUrl, setGithubUrl] = useState("");
   const [error, setError] = useState({ username: "", githubUrl: "", form: "" });
+  const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -36,6 +38,8 @@ const LoginForm = () => {
     try {
       const data = await submitForm({ username, githubUrl });
       console.log("Server response:", data);
+      navigate('/home');
+      
     } catch (error) {
       console.error("Error submitting form:", error);
     }
