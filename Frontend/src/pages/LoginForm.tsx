@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState} from "react";
 import { submitForm } from "../services/api";
 
 import InputField from "../components/InputField";
@@ -33,7 +33,7 @@ const LoginForm = () => {
     return "";
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const newError = { username: "", githubUrl: "", form: "" };
     let hasError = false;
