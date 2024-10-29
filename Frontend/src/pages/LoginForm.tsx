@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { submitForm } from "../services/api";
 
 import InputField from "../components/InputField";
@@ -9,27 +9,50 @@ const LoginForm = () => {
   const [username, setUsername] = useState("");
   const [githubUrl, setGithubUrl] = useState("");
   const [error, setError] = useState({ username: "", githubUrl: "", form: "" });
+  const [isButtonDisabled, setIsButtonDisabled] = useState(true);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    // Verifica si hay errores o campos vacíos para habilitar/deshabilitar el botón
+    setIsButtonDisabled(
+      !!error.username || !!error.githubUrl || !username || !githubUrl
+    );
+  }, [error, username, githubUrl]);
+
+  const validateUsername = (username) => {
+    const usernameRegex = /^[a-zA-Z0-9_-]{1,39}$/;
+    if (!username) {
+      return "Este campo es obligatorio";
+    }
+    if (!usernameRegex.test(username)) {
+      return "El nombre de usuario solo puede contener letras, números, guiones y guiones bajos, y tener hasta 39 caracteres";
+    }
+    return "";
+  };
+
+  const validateGithubUrl = (url) => {
+    const githubUrlRegex = /^https:\/\/github\.com\/[a-zA-Z0-9_-]{1,39}$/;
+    if (!url) {
+      return "Este campo es obligatorio";
+    }
+    if (!githubUrlRegex.test(url)) {
+      return "Debe ingresar una URL válida de GitHub (https://github.com/usuario)";
+    }
+    return "";
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const newError = { username: "", githubUrl: "", form: "" };
     let hasError = false;
 
-    if (!username) {
-      newError.username = "Este campo es obligatorio";
-      hasError = true;
-    } else {
-      hasError = false;
-      newError.username = "";
-    }
-    if (!githubUrl) {
-      newError.githubUrl = "Este campo es obligatorio";
-      hasError = true;
-    } else {
-      hasError = false;
-      newError.githubUrl = "";
-    }
+    // Validación del nombre de usuario
+    newError.username = validateUsername(username);
+    if (newError.username) hasError = true;
+
+    // Validación de la URL de GitHub
+    newError.githubUrl = validateGithubUrl(githubUrl);
+    if (newError.githubUrl) hasError = true;
 
     setError(newError);
 
@@ -42,6 +65,10 @@ const LoginForm = () => {
       
     } catch (error) {
       console.error("Error submitting form:", error);
+      setError((prevError) => ({
+        ...prevError,
+        form: "Hubo un error al enviar el formulario. Inténtalo nuevamente.",
+      }));
     }
   };
 
@@ -65,12 +92,19 @@ const LoginForm = () => {
         </svg>
       </div>
       <form onSubmit={handleSubmit} className="w-96">
-        <h2 className="text-2xl mb-6 text-center text-white">Iniciar sesión</h2>
+        <h2 className="text-2xl mb-6 text-center text-white">Iniciar Sesión</h2>
         <InputField
           id="username"
           type="text"
           value={username}
-          onChange={(e) => setUsername(e.target.value)}
+          onChange={(e) => {
+            const newValue = e.target.value;
+            setUsername(newValue);
+            setError((prevError) => ({
+              ...prevError,
+              username: validateUsername(newValue),
+            }));
+          }}
           label="URL Perfil Platzi"
           error={error.username}
         />
@@ -78,14 +112,21 @@ const LoginForm = () => {
           id="githubUrl"
           type="url"
           value={githubUrl}
-          onChange={(e) => setGithubUrl(e.target.value)}
+          onChange={(e) => {
+            const newValue = e.target.value;
+            setGithubUrl(newValue);
+            setError((prevError) => ({
+              ...prevError,
+              githubUrl: validateGithubUrl(newValue),
+            }));
+          }}
           label="URL Github"
           error={error.githubUrl}
         />
         {error.form && (
           <p className="text-red-500 text-sm mt-1 text-center">{error.form}</p>
         )}
-        <Button type="submit" className="w-full p-3 mt-4">
+        <Button type="submit" className="w-full p-3 mt-4" disabled={isButtonDisabled}>
           Aceptar
         </Button>
       </form>
