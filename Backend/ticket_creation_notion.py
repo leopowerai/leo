@@ -13,7 +13,7 @@ task_data = {
         "title": [
             {
                 "text": {
-                    "content": "Implementar endpoint para listar tareas de usuario"
+                    "content": "Another task bites the dust"
                 }
             }
         ]
@@ -45,7 +45,7 @@ task_data = {
         }
     },
     "story_points": {
-        "number": 3
+        "number": 10
     },
     "feedback": {
         "rich_text": [
@@ -70,6 +70,13 @@ task_data = {
         "select": {
             "name": "backend"
         }
+    },
+    "owners": {  
+        "multi_select": [
+            { "name": "Cirilo" },
+            { "name": "Alvarillo" },
+            { "name": "Niquillo" }
+        ]
     }
 }
 
