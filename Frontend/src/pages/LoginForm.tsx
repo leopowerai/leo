@@ -3,6 +3,7 @@ import { submitForm } from '../services/api';
 import InputField from '../components/InputField';
 import Button from '../components/Button';
 import { useNavigate } from 'react-router-dom';
+import LeoPlatziLogo from "/LeoPlatzi.svg";
 
 const PLATZI_URL_REGEX = /^https:\/\/platzi\.com\/p\/[a-zA-Z0-9_-]{3,20}\/$/;
 const GITHUB_URL_REGEX = /^https:\/\/github\.com\/[a-zA-Z0-9_-]{1,39}$/;
@@ -70,11 +71,10 @@ const LoginForm = () => {
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen w-full bg-primary">
-      <div className="mb-4 w-32 h-auto mx-auto">
-        {/* SVG Logo */}
-      </div>
+    <div className="mb-4" style={{ width: "350px", height: "auto" }}> {/* Ancho ajustado a 138px */}
+      <img src={LeoPlatziLogo} alt="Logo de LeoPlatzi" />
+    </div>
       <form onSubmit={handleSubmit} className="w-96">
-        <h2 className="text-2xl mb-6 text-center text-white">Iniciar Sesión</h2>
         <InputField
           id="username"
           type="text"
@@ -107,7 +107,7 @@ const LoginForm = () => {
           <p className="text-red-500 text-sm mt-1 text-center">{error.form}</p>
         )}
         <Button type="submit" className="w-full p-3 mt-4">
-          Aceptar
+          Iniciar Sesión
         </Button>
       </form>
     </div>
