@@ -11,6 +11,10 @@ function Home() {
   };
   const onCancel = () => {
     setIsVisible(false);
+
+    localStorage.removeItem("username");
+    localStorage.removeItem("githubUrl");
+
     navigate("/");
   };
 

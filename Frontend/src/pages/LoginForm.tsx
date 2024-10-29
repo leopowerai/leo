@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { submitForm } from "../services/api";
 
 import InputField from "../components/InputField";
@@ -66,6 +66,13 @@ const LoginForm = () => {
       }));
     }
   };
+
+  useEffect(() => {
+    if (!localStorage.getItem('username') || !localStorage.getItem('githubUrl')) {
+      localStorage.removeItem('username');
+      localStorage.removeItem('githubUrl');
+    }
+  }, []);
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen w-full bg-primary">
