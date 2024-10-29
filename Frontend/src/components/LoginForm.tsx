@@ -11,37 +11,39 @@ const LoginForm = () => {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="bg-gray-800 p-8 rounded shadow-md w-96">
+    <form onSubmit={handleSubmit} className="w-96">
       <h2 className="text-2xl mb-6 text-center text-white">Iniciar sesión</h2>
-      <div className="mb-4">
-        <label htmlFor="username" className="block mb-2 text-sm font-medium text-white">
-          Nombre de usuario
-        </label>
+      <div className="relative mb-4">
         <input
           type="text"
           id="username"
           value={username}
           onChange={(e) => setUsername(e.target.value)}
-          className="w-full p-3 border border-gray-600 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-700 text-white"
+          className="w-full p-3 border border-gray-600 rounded focus:outline-none focus:ring-1 focus:ring-green-400 focus:border-green-400 bg-input text-white peer"
+          placeholder=" "
           required
         />
-      </div>
-      <div className="mb-6">
-        <label htmlFor="githubUrl" className="block mb-2 text-sm font-medium text-white">
-          URL Github
+        <label htmlFor="username" className="absolute left-3 top-4 text-sm text-white transition-all transform -translate-y-4 scale-90 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-90 peer-focus:-translate-y-4">
+          Nombre de usuario
         </label>
+      </div>
+      <div className="relative mb-6">
         <input
           type="url"
           id="githubUrl"
           value={githubUrl}
           onChange={(e) => setGithubUrl(e.target.value)}
-          className="w-full p-3 border border-gray-600 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-700 text-white"
+          className="w-full p-3 border border-gray-600 rounded focus:outline-none focus:ring-1 focus:ring-green-400 focus:border-green-400 bg-input text-white peer"
+          placeholder=" "
           required
         />
+        <label htmlFor="githubUrl" className="absolute left-3 top-4 text-sm text-white transition-all transform -translate-y-4 scale-90 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-90 peer-focus:-translate-y-4">
+          URL Github
+        </label>
       </div>
       <button
         type="submit"
-        className="w-full p-3 bg-blue-600 text-white rounded hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+        className="w-full p-3 bg-white text-primary-color rounded hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-primary-color"
       >
         Aceptar
       </button>
