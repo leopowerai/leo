@@ -12,12 +12,13 @@ const LoginForm = () => {
   const navigate = useNavigate();
 
   const validateUsername = (username: string) => {
-    const usernameRegex = /^[a-zA-Z0-9_-]{1,39}$/;
+    // Validar que el usuario tenga la URL de Platzi en el formato correcto
+    const platziUrlRegex = /^https:\/\/platzi\.com\/p\/[a-zA-Z0-9_-]{3,20}\/$/;
     if (!username) {
       return "Este campo es obligatorio";
     }
-    if (!usernameRegex.test(username)) {
-      return "El nombre de usuario solo puede contener letras, números, guiones y guiones bajos, y tener hasta 39 caracteres";
+    if (!platziUrlRegex.test(username)) {
+      return "La URL debe seguir el formato: https://platzi.com/p/usuario/";
     }
     return "";
   };
