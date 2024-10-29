@@ -40,9 +40,9 @@
   </thead>
   <tbody>
     <tr>
-      <td><a href="https://github.com/CGallardo98/CodeNet/blob/main/Proyecto.pdf"><b>Presentación del Proyecto</b></a></td> 
-      <td><a href="https://github.com/CGallardo98/CodeNet/pulls?q=is%3Apr+is%3Aclosed"><b>Pull Request Cerradas</b></a></td>
-      <td><img src="https://img.shields.io/github/issues/CGallardo98/CodeNet" alt="Issues abiertos" /></td>
+      <td><a href=""><b>Presentación del Proyecto</b></a></td> 
+      <td><a href="https://github.com/leopowerai/leo/pulls?q=is%3Apr+is%3Aclosed"><b>Pull Request Cerradas</b></a></td>
+      <td><img src="https://github.com/leopowerai/leo/issues?q=is%3Aopen+is%3Aissue" alt="Issues abiertos" /></td>
       <td><img src="https://img.shields.io/github/issues-pr/CGallardo98/CodeNet" alt="Pull Requests Abiertos" /></td>
   </tbody>
 </table>
