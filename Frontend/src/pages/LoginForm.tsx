@@ -19,7 +19,7 @@ const LoginForm = () => {
     );
   }, [error, username, githubUrl]);
 
-  const validateUsername = (username) => {
+  const validateUsername = (username: string) => {
     const usernameRegex = /^[a-zA-Z0-9_-]{1,39}$/;
     if (!username) {
       return "Este campo es obligatorio";
@@ -30,7 +30,7 @@ const LoginForm = () => {
     return "";
   };
 
-  const validateGithubUrl = (url) => {
+  const validateGithubUrl = (url: string) => {
     const githubUrlRegex = /^https:\/\/github\.com\/[a-zA-Z0-9_-]{1,39}$/;
     if (!url) {
       return "Este campo es obligatorio";
