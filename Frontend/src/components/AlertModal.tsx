@@ -8,7 +8,11 @@ interface AlertModalProps {
 
 const AlertModal: React.FC<AlertModalProps> = ({ onAccept, onCancel }) => {
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div
+      className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+      role="dialog"
+      aria-modal="true"
+    >
       <Draggable>
         <div className="bg-white p-6 rounded shadow-lg w-96 text-center">
           <h2 className="text-xl font-semibold mb-4">¿Aceptas tu misión?</h2>
