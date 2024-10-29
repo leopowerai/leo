@@ -71,7 +71,7 @@ const LoginForm = () => {
           type="text"
           value={username}
           onChange={(e) => setUsername(e.target.value)}
-          label="Nombre de usuario"
+          label="URL Perfil Platzi"
           error={error.username}
         />
         <InputField
