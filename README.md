@@ -75,7 +75,7 @@
 <h2>Pruebas y Validación</h2>
 Lorem ipsum
 
-<p><a href="https://github.com/leopowerai/leo/pulls"><b>Ver Pull Request Cerradas</b></a></p>
+<p><a href="https://github.com/leopowerai/leo/pulls?q=is%3Apr+is%3Aclosed"><b>Ver Pull Request Cerradas</b></a></p>
 
 <h2>Estructura del Proyecto</h2>
 
