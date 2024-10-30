@@ -6,7 +6,7 @@ import Button from '../components/Button';
 import { useNavigate } from 'react-router-dom';
 import LeoPlatziLogo from "/LeoPlatzi.svg";
 
-const PLATZI_URL_REGEX = /^https:\/\/platzi\.com\/p\/[a-zA-Z0-9_-]{3,20}\/$/;
+const PLATZI_URL_REGEX = /^https:\/\/platzi\.com\/p\/[a-zA-Z0-9._-]{3,20}\/$/; // Modificación para permitir puntos
 const GITHUB_URL_REGEX = /^https:\/\/github\.com\/[a-zA-Z0-9_-]{1,39}$/;
 
 const validateUsername = (username: string): string => {
