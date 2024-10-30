@@ -1,5 +1,5 @@
 import React, { useState, useContext } from 'react';
-import { AuthContext } from '../AuthContext';
+import AuthContext from '../contexts/AuthContext';
 import { submitForm } from '../services/api';
 import InputField from '../components/InputField';
 import Button from '../components/Button';

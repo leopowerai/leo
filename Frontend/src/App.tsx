@@ -1,7 +1,8 @@
 // src/App.tsx
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import { AuthProvider, AuthContext } from './AuthContext';
+import AuthProvider from './providers/AuthProvider';
+import AuthContext from './contexts/AuthContext';
 import LoginForm from './pages/LoginForm';
 import Home from './pages/Home';
 import './App.css';
@@ -12,8 +13,15 @@ function App() {
       <Router>
         <Routes>
           <Route path="/" element={<LoginForm />} />
-          <Route path="/home" element={<PrivateRoute><Home /></PrivateRoute>} />
-          {/* Add other routes here */}
+          <Route
+            path="/home"
+            element={
+              <PrivateRoute>
+                <Home />
+              </PrivateRoute>
+            }
+          />
+          {/* Add any other routes here */}
         </Routes>
       </Router>
     </AuthProvider>
@@ -24,7 +32,7 @@ function PrivateRoute({ children }: { children: JSX.Element }) {
   const authContext = React.useContext(AuthContext);
 
   if (authContext === null) {
-    // Optionally, render a loading spinner here
+    // Render the loading spinner while loading
     return null;
   }
 

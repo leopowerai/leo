@@ -1,5 +1,5 @@
-import React, { useState, useCallback, useContext } from 'react';
-import { AuthContext } from '../AuthContext';
+import { useState, useCallback, useContext } from 'react';
+import AuthContext from '../contexts/AuthContext';
 import { FaCheck, FaTrashAlt } from "react-icons/fa";
 import AlertModal from "../components/AlertModal";
 import { useNavigate } from "react-router-dom";
