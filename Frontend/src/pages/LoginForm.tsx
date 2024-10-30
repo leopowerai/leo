@@ -77,10 +77,11 @@ const LoginForm = () => {
           type="text"
           value={username}
           onChange={(e) => {
-            setUsername(e.target.value);
+            const inputValue = e.target.value.replace('https://platzi.com/@', 'https://platzi.com/p/');
+            setUsername(inputValue);
             setError((prevError) => ({
               ...prevError,
-              username: validateUsername(e.target.value),
+              username: validateUsername(inputValue),
             }));
           }}
           label="URL Perfil Platzi"
