@@ -3,7 +3,7 @@ import AuthContext from '../contexts/AuthContext';
 import { FaCheck, FaTrashAlt } from "react-icons/fa";
 import AlertModal from "../components/AlertModal";
 import { useNavigate } from "react-router-dom";
-import { updatePbiStatus } from '../services/api';
+import { unassign, updatePbiStatus } from '../services/api';
 //import KanbanBoard from '../components/KanbanBoard';
 
 const IFRAME_SRC =
@@ -24,24 +24,34 @@ function Home() {
     }
   };
 
-
   const handleCancel = useCallback(() => {
     setIsModalVisible(false);
     authContext?.logout();
     navigate('/');
   }, [navigate, authContext]);
 
-  const handleComplete = useCallback(() => {
+  const handleComplete = async () => {
     // Implement the logic for marking the project as completed
-    
-  }, []);
+    if (authContext?.username) {
+      await updatePbiStatus({ username: authContext.username, status: "In Review" });
+      setIsModalVisible(false);
+    } else {
+      console.error("Username is not available in the auth context");
+    }
+  };
 
-  const handleAbandon = useCallback(() => {
+  const handleAbandon = async () => {
     // Implement the logic for abandoning the project
     console.log('Project abandoned');
+    if (authContext?.username) {
+      await unassign({ username: authContext.username});
+      setIsModalVisible(false);
+    } else {
+      console.error("Username is not available in the auth context");
+    }
     authContext?.logout();
     navigate('/');
-  }, [navigate, authContext]);
+  };
 
   return (
     <div className="min-h-screen bg-primary p-8 relative">
