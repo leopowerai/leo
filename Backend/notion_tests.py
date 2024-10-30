@@ -36,15 +36,17 @@ else:
         for notion_pbi in notion_pbis:
             formatted_pbis.append(ProductBacklogItem(*notion_pbi))
 
+        print(formatted_pbis)
+
         # Product Backlog Item assign
         pbi_assigner = PBIAssigner(
             student=student,
             project=selected_project,
             project_match_techs=[selected_tech],
             pbis=formatted_pbis,
+            db_handler=notion_handler,
         )
 
-        # TODO: AGREGAR EL METODO DE UPDATE PARA MODIFICAR NOTION
         assigned_pbi = pbi_assigner.assign_pbi_to_student()
         if assigned_pbi:
             print(f"Se asignó el ticket: {assigned_pbi.title}")

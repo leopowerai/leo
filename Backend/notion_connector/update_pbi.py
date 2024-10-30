@@ -9,7 +9,7 @@ notion = Client(auth=NOTION_API_KEY)
 
 
 def update_notion_pbi(
-    page_id, status=None, owners=None, update_due_date=False, url_pr=None, feedback=None
+    pbi_id, status=None, owners=None, update_due_date=False, url_pr=None, feedback=None
 ):
     # Prepare the properties to update
     update_data = {}
@@ -39,10 +39,12 @@ def update_notion_pbi(
 
     # Attempt to update the page with the specified properties
     try:
-        response = notion.pages.update(page_id=page_id, properties=update_data)
+        response = notion.pages.update(page_id=pbi_id, properties=update_data)
         print("Item updated successfully:", response)
+        return True, response
     except Exception as e:
         print("Failed to update item:", e)
+        return False, None
 
 
 # Example usage of the update_pbi function

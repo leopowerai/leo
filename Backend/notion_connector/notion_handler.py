@@ -1,19 +1,31 @@
+from db_handler import BaseDBHandler
 from notion_connector.read_pbis import read_notion_pbis_for_project
 from notion_connector.read_projects import read_notion_projects
 from notion_connector.update_pbi import update_notion_pbi
 from pbi_assigner import Status
 
 
-class NotionHandler:
+class NotionHandler(BaseDBHandler):
     def __init__(self):
         # TODO: Get the env variables in here to make them available for all the methods
-        pass
+        super().__init__()
 
     def create_pbi():
         pass
 
-    def update_pbi():
-        update_notion_pbi()
+    def update_pbi(
+        self,
+        pbi_id,
+        status=None,
+        owners=None,
+        update_due_date=False,
+        url_pr=None,
+        feedback=None,
+    ):
+        success, result = update_notion_pbi(
+            pbi_id, status, owners, update_due_date, url_pr, feedback
+        )
+        return success, result
 
     def read_projects(self):
         notion_projects = read_notion_projects()
@@ -55,6 +67,10 @@ def _extract_project_info(project):
 
 
 def _extract_pbi_info(pbi_data):
+
+    # Extract the PBI ID (top-level key "id")
+    print(pbi_data.get("id", "No ID found"))
+    pbi_id = pbi_data.get("id", "No ID found")
     # Title
     title = (
         pbi_data.get("properties", {})
@@ -103,6 +119,7 @@ def _extract_pbi_info(pbi_data):
     assigned_to = owners_prop[0]["name"] if owners_prop else None
 
     return (
+        pbi_id,
         title,
         description,
         story_points,
