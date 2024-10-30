@@ -20,6 +20,7 @@ def get_projects():
     """Retrieve the list of projects."""
     # Placeholder for actual project retrieval logic
     project1 = Project(
+        id="1",
         name="Test Project 1",
         stack=["Python", "Django", "JavaScript", "React"]
     )
