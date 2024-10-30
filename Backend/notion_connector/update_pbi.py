@@ -8,7 +8,7 @@ NOTION_API_KEY = os.getenv("NOTION_API_KEY")
 notion = Client(auth=NOTION_API_KEY)
 
 
-def update_notion_task(
+def update_notion_pbi(
     page_id, status=None, owners=None, update_due_date=False, url_pr=None, feedback=None
 ):
     # Prepare the properties to update
@@ -45,19 +45,19 @@ def update_notion_task(
         print("Failed to update item:", e)
 
 
-# Example usage of the update_task function
-page_id = "12e3386028bd8194a1ebc61fa6922160"  # Replace with the actual page ID of the task to update
-status = "Listo"
-owners = ["Cirillo", "Nekoking", "Itachi456"]
-update_due_date = True
-url_pr = "https://example.com/pull-request"
-feedback = "This task requires additional research on integration with the main API."
+# Example usage of the update_pbi function
+# page_id = "12e3386028bd8194a1ebc61fa6922160"  # Replace with the actual page ID of the pbi to update
+# status = "En curso"
+# owners = ["Alguarito"]
+# update_due_date = True
+# url_pr = "https://github.com/sldkfldsk"
+# feedback = "Deberias vender bianchi en un semaforo"
 
-update_notion_task(
-    page_id,
-    status=status,
-    owners=owners,
-    update_due_date=update_due_date,
-    url_pr=url_pr,
-    feedback=feedback,
-)
+# update_notion_pbi(
+#     page_id,
+#     status=status,
+#     owners=owners,
+#     update_due_date=update_due_date,
+#     url_pr=url_pr,
+#     feedback=feedback,
+# )

@@ -8,7 +8,9 @@ def main():
     try:
         # Get the projects
         project1 = Project(
-            name="Test Project 1", stack=["Python", "Django", "JavaScript", "React"]
+            id="some-id",
+            name="Test Project 1",
+            stack=["Python", "Django", "JavaScript", "React"],
         )
         projects = [project1]
 
@@ -40,18 +42,20 @@ def main():
             print("No se encontraron los perfiles de Platzi o GitHub")
         else:
             project_assigner = ProjectAssigner(student, projects)
-            project_match = project_assigner.find_project_for_student()
+            project_match, selected_project, selected_tech = (
+                project_assigner.find_project_for_student()
+            )
 
             if project_match:
                 print(
-                    f"Match de proyecto {project_match[0].name} con {project_match[1]} tech, para el estudiante {student.platzi_username}"
+                    f"Match de proyecto {selected_project.name} con {selected_tech} tech, para el estudiante {student.platzi_username}"
                 )
 
                 # Product Backlog Item assign
                 pbi_assigner = PBIAssigner(
                     student=student,
                     project=project1,
-                    project_match_techs=[project_match[1]],
+                    project_match_techs=[selected_tech],
                     pbis=pbis,
                 )
 

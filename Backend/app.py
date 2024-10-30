@@ -6,7 +6,13 @@ from project_assigner import Project, ProjectAssigner
 app = Flask(__name__)
 CORS(app)
 
+# TODO: Endpoint para desasignar un PBI
+# TODO: Actualizar el estado de la PBI a completado
+# TODO: Actualizar el estado de la PBI a en progreso
+# TODO: Retornar un bool si un PBI está asignado a un usuario y debe estar en progreso
 
+
+# TODO: EL endpoint de submit debe retornar la url del iframe
 @app.route("/submit", methods=["POST"])
 def submit():
     data = request.get_json()

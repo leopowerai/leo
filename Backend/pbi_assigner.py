@@ -1,6 +1,7 @@
 from enum import Enum
 from typing import List, Optional
 
+from notion_connector.notion_handler import NotionHandler
 from profile_generator import Student
 from project_assigner import Project
 
@@ -12,13 +13,13 @@ class Complexity(Enum):
     HIGH = "High"
 
 
-# Define Enum for Status
+# Define Enum for Status # NOT USED FOR NOW
 class Status(Enum):
     OPEN = "open"
-    IN_PROGRESS = "in_progress"
+    IN_PROGRESS = "in progress"
     DONE = "done"
     BLOCKED = "blocked"
-    IN_REVIEW = "in_review"
+    IN_REVIEW = "in review"
 
 
 # Define ProductBacklogItem class
@@ -27,14 +28,16 @@ class ProductBacklogItem:
         self,
         title: str,
         description: str,
-        complexity: Complexity,
+        story_points: int,
         stack: List[str],
         project: Project,
         status: Status = Status.OPEN,
         assigned_to: Optional[str] = None,
+        complexity: Optional[Complexity] = None,
     ):
         self.title = title
         self.description = description
+        self.story_points = story_points
         self.complexity = complexity
         self.stack = stack
         self.assigned_to = assigned_to
@@ -48,6 +51,14 @@ class ProductBacklogItem:
     def set_status(self, new_status) -> None:
         # Process for updating ticket in here
         self.status = new_status
+
+    def assign(self, student, handler):
+        # Update in notion
+        success, result = handler.update_pbi()
+        if success:
+            print(f"Updated PBI:{self.title}: {result}")
+        else:
+            print(f"Failed to update PBI: {self.title}")
 
     def __repr__(self):
         return (
@@ -64,6 +75,7 @@ class PBIAssigner:
         project: Project,
         project_match_techs: List[str],
         pbis: List[ProductBacklogItem],
+        db_handler: NotionHandler,  # This could be a parent class, NotionHandler is the child
     ):
         self.student = student
         self.project = project
@@ -76,8 +88,13 @@ class PBIAssigner:
         """
 
         for pbi in self.pbis:
+            # print(f"PBI status: {pbi.status}")
+            # print(f"PBI Assigned to: {pbi.assigned_to}")
             if pbi.status == Status.OPEN and pbi.assigned_to is None:
+                # print(f"Match techs: {self.project_match_techs}")
+                # print(f"PBI stack: {pbi.stack}")
                 for match_tech in self.project_match_techs:
+
                     if match_tech in pbi.stack:
                         # Assign ticket
                         pbi.set_assigned_to(self.student)
