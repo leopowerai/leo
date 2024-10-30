@@ -10,7 +10,7 @@ logging.basicConfig(level=logging.INFO)
 
 
 def assign_workflow(platzi_url, github_url):
-
+    logging.info("Assign workflow started")
     if not platzi_url or not github_url:
         response_dict = {"error": "Ambos campos son requeridos"}
         response_code = 400
@@ -28,12 +28,14 @@ def assign_workflow(platzi_url, github_url):
 
     # Bulk project instantiation from Notion ESTO PUEDE IR DENTRO DE NotionHandler
     notion_handler = NotionHandler()
+    logging.info("Reading projects from Notion")
     notion_projects = notion_handler.read_projects()
     formatted_projects = []
 
     for notion_project in notion_projects:
         formatted_projects.append(Project(*notion_project))
 
+    logging.info(f"Assigning project to student {student.platzi_username}")
     project_assigner = ProjectAssigner(student, formatted_projects)
     project_match, selected_project, selected_tech = (
         project_assigner.find_project_for_student()
@@ -45,6 +47,7 @@ def assign_workflow(platzi_url, github_url):
         )
 
         # Get the PBIs from the project ESTO PUEDE IR DENTRO DE NotionHandler
+        logging.info(f"Reading PBIs for project {selected_project.id}")
         notion_pbis = notion_handler.read_pbis(selected_project.id)
         formatted_pbis = []
         for notion_pbi in notion_pbis:
@@ -58,7 +61,7 @@ def assign_workflow(platzi_url, github_url):
             pbis=formatted_pbis,
             db_handler=notion_handler,
         )
-
+        logging.info(f"Assigning PBI to {student.platzi_username}")
         assigned_pbi = pbi_assigner.assign_pbi_to_student()
         if assigned_pbi:
             message = f"Se asignó el PBI: {assigned_pbi.title}"
@@ -68,6 +71,7 @@ def assign_workflow(platzi_url, github_url):
                 "iframe_url": f"https://v2-embednotion.com/12e3386028bd8066a3afe385ed758696?p={assigned_pbi.id}",
             }
             response_code = 200
+            return response_dict, response_code
         else:
             message = "No se encontró PBI para asignar"
             logging.info(message)

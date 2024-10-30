@@ -10,7 +10,7 @@ class NotionHandler(BaseDBHandler):
         # TODO: Get the env variables in here to make them available for all the methods
         super().__init__()
 
-    def create_pbi():
+    def create_pbi(self):
         pass
 
     def update_pbi(
@@ -69,7 +69,6 @@ def _extract_project_info(project):
 def _extract_pbi_info(pbi_data):
 
     # Extract the PBI ID (top-level key "id")
-    print(pbi_data.get("id", "No ID found"))
     pbi_id = pbi_data.get("id", "No ID found")
     # Title
     title = (

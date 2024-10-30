@@ -40,7 +40,7 @@ def update_notion_pbi(
     # Attempt to update the page with the specified properties
     try:
         response = notion.pages.update(page_id=pbi_id, properties=update_data)
-        print("Item updated successfully:", response)
+        print("Item updated successfully")
         return True, response
     except Exception as e:
         print("Failed to update item:", e)

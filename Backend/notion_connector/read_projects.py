@@ -26,6 +26,6 @@ def print_project_info(project):
 
 
 # Example: Fetch all projects
-projects = read_notion_projects()
-for p in projects:
-    print_project_info(p)
+# projects = read_notion_projects()
+# for p in projects:
+#     print_project_info(p)
