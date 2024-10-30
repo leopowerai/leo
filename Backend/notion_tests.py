@@ -36,8 +36,6 @@ else:
         for notion_pbi in notion_pbis:
             formatted_pbis.append(ProductBacklogItem(*notion_pbi))
 
-        print(formatted_pbis)
-
         # Product Backlog Item assign
         pbi_assigner = PBIAssigner(
             student=student,
