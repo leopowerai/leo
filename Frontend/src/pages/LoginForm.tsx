@@ -1,4 +1,5 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useContext } from 'react';
+import { AuthContext } from '../AuthContext';
 import { submitForm } from '../services/api';
 import InputField from '../components/InputField';
 import Button from '../components/Button';
@@ -32,6 +33,7 @@ const LoginForm = () => {
   const [error, setError] = useState<ErrorState>({});
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const authContext = useContext(AuthContext);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -51,9 +53,7 @@ const LoginForm = () => {
 
     try {
       await submitForm({ username, githubUrl });
-      localStorage.setItem('username', username);
-      localStorage.setItem('githubUrl', githubUrl);
-      setLoading(false);
+      authContext?.login(username, githubUrl);
       navigate('/home');
     } catch (error) {
       console.error('Error submitting form:', error);
@@ -65,14 +65,6 @@ const LoginForm = () => {
     }
   };
 
-  useEffect(() => {
-    const storedUsername = localStorage.getItem('username');
-    const storedGithubUrl = localStorage.getItem('githubUrl');
-    if (!storedUsername || !storedGithubUrl) {
-      localStorage.removeItem('username');
-      localStorage.removeItem('githubUrl');
-    }
-  }, []);
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen w-full bg-primary">
@@ -93,6 +85,7 @@ const LoginForm = () => {
           }}
           label="URL Perfil Platzi"
           error={error.username}
+          disabled={loading}
         />
         <InputField
           id="githubUrl"
@@ -107,6 +100,7 @@ const LoginForm = () => {
           }}
           label="URL Github"
           error={error.githubUrl}
+          disabled={loading}
         />
         {error.form && (
           <p className="text-red-500 text-sm mt-1 text-center">{error.form}</p>
