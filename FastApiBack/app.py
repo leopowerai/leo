@@ -19,7 +19,9 @@ origins = [
     "http://localhost",
     "http://localhost:5173",
     "http://localhost:8080",
-    "https://leofront.vercel.app/"
+    "https://leofront.vercel.app/",
+    "https://vercel.com/api/toolbar/link/leofront-alvaro-hernandezs-projects-3e848f94.vercel.app?via=project-dashboard-alias-list&p=1&page=/",
+    "https://vercel.com/api/toolbar/link/leofront-git-main-alvaro-hernandezs-projects-3e848f94.vercel.app?via=project-dashboard-alias-list&p=1&page=/"
 ]
 
 app.add_middleware(
