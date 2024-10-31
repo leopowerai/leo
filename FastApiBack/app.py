@@ -2,17 +2,17 @@
 import logging
 import os
 
-from dotenv import load_dotenv
+# from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
+from notion_connector.notion_handler import NotionHandler
 from notion_connector.update_pbi import update_notion_pbi
 from workflows import assign_workflow
-from notion_connector.notion_handler import NotionHandler
 
 app = FastAPI()
 
-load_dotenv()
+# load_dotenv()
 
 origins = [
     "http://localhost.tiangolo.com",
@@ -47,7 +47,9 @@ async def submit(request: Request):
 
     except Exception as e:
         logging.error(f"Error processing submit request: {e}")
-        raise HTTPException(status_code=500, detail="Error procesando la solicitud /submit")
+        raise HTTPException(
+            status_code=500, detail="Error procesando la solicitud /submit"
+        )
 
 
 @app.post("/unassign")
@@ -63,22 +65,30 @@ async def unassign(request: Request):
 
     try:
         notion_handler = NotionHandler()
-        
+
         # Set owners to an empty list to unassign the student
-        success, result = await notion_handler.update_pbi(pbi_id, owners=[], status="open")
-        
+        success, result = await notion_handler.update_pbi(
+            pbi_id, owners=[], status="open"
+        )
+
         await notion_handler.close()
-        
+
         if success:
-            response_dict = {"message": f"Estudiante {student_username} desasignado exitosamente"}
+            response_dict = {
+                "message": f"Estudiante {student_username} desasignado exitosamente"
+            }
             return JSONResponse(content=response_dict, status_code=200)
         else:
-            response_dict = {"error": f"Error desasignando estudiante {student_username}"}
+            response_dict = {
+                "error": f"Error desasignando estudiante {student_username}"
+            }
             return JSONResponse(content=response_dict, status_code=400)
-    
+
     except Exception as e:
         logging.error(f"Error processing unassign request: {e}")
-        raise HTTPException(status_code=500, detail="Error procesando la solicitud /unassign")
+        raise HTTPException(
+            status_code=500, detail="Error procesando la solicitud /unassign"
+        )
 
 
 @app.post("/is_assigned")
@@ -93,30 +103,39 @@ async def is_assigned_to_open_pbi(request: Request):
 
     try:
         notion_handler = NotionHandler()
-        is_assigned = await notion_handler.is_student_assigned_to_open_pbi(student_username)
+        is_assigned = await notion_handler.is_student_assigned_to_open_pbi(
+            student_username
+        )
         await notion_handler.close()
 
         response_dict = {"is_assigned": is_assigned}
         return JSONResponse(content=response_dict, status_code=200)
     except Exception as e:
         logging.error(f"Error processing is_assigned request: {e}")
-        raise HTTPException(status_code=500, detail="Error procesando la solicitud /is_assigned")
+        raise HTTPException(
+            status_code=500, detail="Error procesando la solicitud /is_assigned"
+        )
+
 
 @app.post("/update_pbi_status")
 async def update_pbi_status(request: Request):
     logging.info("Received request on /update_pbi_status")
     data = await request.json()
     pbi_id = data.get("pbiId")
-    pbi_status = data.get("status") # Status can be "open", "in progress", "in review", or "done"
+    pbi_status = data.get(
+        "status"
+    )  # Status can be "open", "in progress", "in review", or "done"
     url_pr = data.get("urlPR") or None
 
     try:
         # Call the function to update the PBI in Notion
         notion_handler = NotionHandler()
-        success, result = await notion_handler.update_pbi(pbi_id, status=pbi_status, url_pr=url_pr)
+        success, result = await notion_handler.update_pbi(
+            pbi_id, status=pbi_status, url_pr=url_pr
+        )
         await notion_handler.close()
 
-        if(success):
+        if success:
             response_dict = {"message": "PBI updated successfully"}
             return JSONResponse(content=response_dict, status_code=200)
         else:
@@ -124,6 +143,3 @@ async def update_pbi_status(request: Request):
             return JSONResponse(content=response_dict, status_code=400)
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
-
-
-

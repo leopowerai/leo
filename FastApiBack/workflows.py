@@ -1,10 +1,12 @@
 # workflows.py
 
 import logging
-from profile_generator import Student
+
 from notion_connector.notion_handler import NotionHandler
-from project_assigner import Project, ProjectAssigner
 from pbi_assigner import PBIAssigner, ProductBacklogItem
+from profile_generator import Student
+from project_assigner import Project, ProjectAssigner
+
 
 async def assign_workflow(platzi_url, github_url):
     logging.info("Assign workflow started")
@@ -62,9 +64,13 @@ async def assign_workflow(platzi_url, github_url):
             if assigned_pbi:
                 message = f"Se asignó el PBI: {assigned_pbi.title}"
                 logging.info(message)
+                f_project_id = remove_char(selected_project.id, "-")
+                f_pbi_id = remove_char(assigned_pbi.id, "-")
+
                 response_dict = {
                     "message": message,
                     "pbiId": assigned_pbi.id,
+                    "iframe_url": f"https://v2-embednotion.com/theffs/{f_project_id}?p={f_pbi_id}&pm=s",
                 }
                 response_code = 200
                 return response_dict, response_code
@@ -75,12 +81,14 @@ async def assign_workflow(platzi_url, github_url):
                 response_code = 400
                 return response_dict, response_code
         else:
-            message = (
-                f"No hubo match de proyecto para el estudiante {student.platzi_username}"
-            )
+            message = f"No hubo match de proyecto para el estudiante {student.platzi_username}"
             logging.info(message)
             response_dict = {"error": message}
             response_code = 400
             return response_dict, response_code
     finally:
         await notion_handler.close()
+
+
+def remove_char(string, character):
+    return string.replace(character, "")
