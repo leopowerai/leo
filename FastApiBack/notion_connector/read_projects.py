@@ -1,5 +1,6 @@
 # notion_connector/read_projects.py
 
+import asyncio
 import os
 
 import aiohttp
@@ -17,7 +18,16 @@ async def read_notion_projects(session):
         "Content-Type": "application/json",
     }
 
-    async with session.post(url, headers=headers) as response:
+    # Define the filter payload
+    filter_payload = {
+        "filter": {
+            "property": "status",  # Make sure this matches the name of your status property in Notion
+            "status": {"equals": "in progress"},  # The status you want to filter by
+        }
+    }
+
+    # Include the filter in the POST request
+    async with session.post(url, headers=headers, json=filter_payload) as response:
         if response.status == 200:
             data = await response.json()
             projects = data.get("results", [])
@@ -25,3 +35,15 @@ async def read_notion_projects(session):
         else:
             error_text = await response.text()
             raise Exception(f"Error fetching projects: {response.status}, {error_text}")
+
+
+# Tests
+async def test_read_projects():
+    async with aiohttp.ClientSession() as session:
+        projects = await read_notion_projects(session)
+        for project in projects:
+            # Extract the project's name
+            project_name = project["properties"]["project_name"]["title"][0]["text"][
+                "content"
+            ]
+            print(f"Project Name: {project_name}")
