@@ -9,26 +9,29 @@ interface AuthProviderProps {
 const AuthProvider = ({ children }: AuthProviderProps) => {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
   const [username, setUsername] = useState<string>("");
+  const [pbiId, setPbiId] = useState<string>("");
 
 
-  const login = (username: string, githubUrl: string) => {
+  const login = (username: string, pbiId: string) => {
     localStorage.setItem('username', username);
-    localStorage.setItem('githubUrl', githubUrl);
+    localStorage.setItem('pbiId', pbiId);
     setIsAuthenticated(true);
     setUsername(username);
+    setPbiId(pbiId);
   };
 
   const logout = () => {
     localStorage.removeItem('username');
-    localStorage.removeItem('githubUrl');
     setIsAuthenticated(false);
     setUsername("");
+    setPbiId("");
   };
 
 
   const authContextValue: AuthContextType = {
     isAuthenticated,
     username,
+    pbiId,
     login,
     logout,
   };

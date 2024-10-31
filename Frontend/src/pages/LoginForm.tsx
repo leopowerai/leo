@@ -52,8 +52,9 @@ const LoginForm = () => {
     setLoading(true);
 
     try {
-      await submitForm({ username, githubUrl });
-      authContext?.login(username, githubUrl);
+      const response = await submitForm({ username, githubUrl });
+      authContext?.login(username, response.pbiId);
+      authContext?.login(username, "");
       navigate('/home');
     } catch (error) {
       console.error('Error submitting form:', error);

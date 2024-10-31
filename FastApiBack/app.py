@@ -2,7 +2,7 @@
 import logging
 import os
 
-# from dotenv import load_dotenv
+from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
@@ -12,7 +12,7 @@ from notion_connector.notion_handler import NotionHandler
 
 app = FastAPI()
 
-# load_dotenv()
+load_dotenv()
 
 origins = [
     "http://localhost.tiangolo.com",
@@ -55,10 +55,10 @@ async def unassign(request: Request):
     logging.info("Received request on /unassign")
     data = await request.json()
     student_username = data.get("username")
-    pbi_id = data.get("pbi_id")
+    pbi_id = data.get("pbiId")
 
     if not student_username or not pbi_id:
-        response_dict = {"error": "El campo 'username' y 'pbi_id' son requeridos"}
+        response_dict = {"error": "El campo 'username' y 'pbiId' son requeridos"}
         return JSONResponse(content=response_dict, status_code=400)
 
     try:
@@ -106,9 +106,9 @@ async def is_assigned_to_open_pbi(request: Request):
 async def update_pbi_status(request: Request):
     logging.info("Received request on /update_pbi_status")
     data = await request.json()
-    pbi_id = data.get("pbi_id")
+    pbi_id = data.get("pbiId")
     pbi_status = data.get("status") # Status can be "open", "in progress", "in review", or "done"
-    url_pr = data.get("url_pr") or None
+    url_pr = data.get("urlPR") or None
 
     try:
         # Call the function to update the PBI in Notion

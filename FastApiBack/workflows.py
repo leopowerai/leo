@@ -20,7 +20,7 @@ async def assign_workflow(platzi_url, github_url):
         no_profile_text = "No se encontraron los perfiles de Platzi o GitHub"
         logging.info(no_profile_text)
         response_dict = {"message": no_profile_text}
-        response_code = 404
+        response_code = 400
         return response_dict, response_code
 
     # Instantiate NotionHandler
@@ -64,7 +64,7 @@ async def assign_workflow(platzi_url, github_url):
                 logging.info(message)
                 response_dict = {
                     "message": message,
-                    "iframe_url": f"https://v2-embednotion.com/{assigned_pbi.id}",
+                    "pbiId": assigned_pbi.id,
                 }
                 response_code = 200
                 return response_dict, response_code

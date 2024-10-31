@@ -1,52 +1,98 @@
-import { useState, useCallback, useContext } from 'react';
+// src/pages/Home.tsx
+import { useState, useContext } from 'react';
 import AuthContext from '../contexts/AuthContext';
-import { FaCheck, FaTrashAlt } from "react-icons/fa";
-import AlertModal from "../components/AlertModal";
-import { useNavigate } from "react-router-dom";
-import { updatePbiStatus } from '../services/api';
-//import KanbanBoard from '../components/KanbanBoard';
-
-const IFRAME_SRC =
-  "https://v2-embednotion.com/theffs/Plataforma-de-Gesti-n-de-Tareas-Colaborativas-12e3386028bd8066a3afe385ed758696?p=12e3386028bd81b48459d62eba3036a4&pm=s";
+import { FaCheck, FaTrashAlt } from 'react-icons/fa';
+import AlertModal from '../components/AlertModal';
+import PullRequestModal from '../components/PullRequestModal';
+import { useNavigate } from 'react-router-dom';
+import { unassign, updatePbiStatus } from '../services/api';
 
 function Home() {
-  const [isModalVisible, setIsModalVisible] = useState(true);
+  const [isAlertVisible, setIsAlertVisible] = useState(true);
+  const [isPullRequestModalVisible, setIsPullRequestModalVisible] = useState(false);
   const navigate = useNavigate();
   const authContext = useContext(AuthContext);
 
+  // Destructure authContext for easier access
+  const { username, pbiId, logout } = authContext || {};
+
   const handleAccept = async () => {
-    
-    if (authContext?.username) {
-      await updatePbiStatus({ username: authContext.username, status: "In Progress" });
-      setIsModalVisible(false);
+    //if (pbiId) {
+    if (true) {
+      try {
+        //await updatePbiStatus({ pbiId, status: 'in progress'});
+        setIsAlertVisible(false);
+      } catch (error) {
+        console.error('Error updating PBI status:', error);
+      }
     } else {
-      console.error("Username is not available in the auth context");
+      console.error('pbiId is not available in the auth context');
     }
   };
 
+  const handleCancel = async () => {
+    if (username && pbiId) {
+      try {
+        await unassign({ username, pbiId });
+        authContext?.logout();
+        navigate('/');
+      } catch (error) {
+        console.error('Error unassigning user:', error);
+      }
+    } else {
+      console.error('Username and pbiId are not available in the auth context');
+    }
+  };
 
-  const handleCancel = useCallback(() => {
-    setIsModalVisible(false);
-    authContext?.logout();
-    navigate('/');
-  }, [navigate, authContext]);
+  const handleComplete = () => {
+    setIsPullRequestModalVisible(true);
+  };
 
-  const handleComplete = useCallback(() => {
-    // Implement the logic for marking the project as completed
-    
-  }, []);
+  const handlePullRequestSubmit = async (link: string) => {
+    //if (pbiId) {
+    if (true) {
+      try {
+        //await updatePbiStatus({ pbiId, status: 'completed', urlPR: link });
+        setIsPullRequestModalVisible(false);
+      } catch (error) {
+        console.error('Error submitting pull request link:', error);
+      }
+    } else {
+      console.error('pbiId is not available in the auth context');
+    }
+  };
 
-  const handleAbandon = useCallback(() => {
-    // Implement the logic for abandoning the project
-    console.log('Project abandoned');
-    authContext?.logout();
-    navigate('/');
-  }, [navigate, authContext]);
+  const handlePullRequestCancel = () => {
+    setIsPullRequestModalVisible(false);
+  };
+
+  const handleAbandon = async () => {
+    if (username && pbiId) {
+      try {
+        await unassign({ username, pbiId });
+        authContext?.logout();
+        navigate('/');
+      } catch (error) {
+        console.error('Error abandoning project:', error);
+      }
+    } else {
+      console.error('Username and pbiId are not available in the auth context');
+    }
+  };
+
+  const IFRAME_SRC = `https://v2-embednotion.com/12e3386028bd8066a3afe385ed758696?p=${pbiId}`;
 
   return (
     <div className="min-h-screen bg-primary p-8 relative">
-      {isModalVisible && (
+      {isAlertVisible && (
         <AlertModal onAccept={handleAccept} onCancel={handleCancel} />
+      )}
+
+      {isPullRequestModalVisible && (
+        <PullRequestModal
+          onSubmit={handlePullRequestSubmit}
+          onCancel={handlePullRequestCancel}
+        />
       )}
 
       <button
@@ -54,10 +100,10 @@ function Home() {
         className="absolute top-4 right-8 bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-400 flex items-center whitespace-nowrap"
       >
         <FaCheck className="mr-2" />
-        Marcar como completado
+        Adjuntar Pull Request Link
       </button>
 
-      <div className=" mx-auto mt-10 mb-10">
+      <div className="mx-auto mt-10 mb-10">
         <iframe
           src={IFRAME_SRC}
           className="w-full min-h-screen relative z-10"
@@ -65,9 +111,6 @@ function Home() {
         />
       </div>
 
-      {/*<div className="min-h-screen bg-primary p-8">
-        <KanbanBoard />
-      </div>*/}
       <button
         onClick={handleAbandon}
         className="absolute bottom-4 left-8 border-2 border-red-500 text-white px-4 py-2 rounded hover:bg-red-900 focus:outline-none focus:ring-2 focus:ring-red-400 flex items-center whitespace-nowrap"
