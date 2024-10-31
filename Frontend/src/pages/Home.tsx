@@ -108,6 +108,13 @@ function Home() {
         />
       )}
 
+      {/* <button
+        onClick={handleComplete}
+        className="absolute top-4 right-72  border-gray-500 text-gray-400 px-4 py-2 rounded hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-400 flex items-center whitespace-nowrap"
+      >
+        Ir al repositorio
+      </button> */}
+
       <button
         onClick={handleComplete}
         className="absolute top-4 right-8 bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-400 flex items-center whitespace-nowrap"
