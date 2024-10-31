@@ -70,7 +70,7 @@ async def assign_workflow(platzi_url, github_url):
                 response_dict = {
                     "message": message,
                     "pbiId": assigned_pbi.id,
-                    "iframe_url": f"https://v2-embednotion.com/theffs/{f_project_id}?p={f_pbi_id}&pm=s",
+                    "iframeUrl": f"https://v2-embednotion.com/theffs/{f_project_id}?p={f_pbi_id}&pm=s",
                 }
                 response_code = 200
                 return response_dict, response_code

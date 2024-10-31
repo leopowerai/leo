@@ -1,11 +1,12 @@
 // src/pages/Home.tsx
-import { useState, useContext } from 'react';
+import { useState, useContext, useEffect } from 'react';
 import AuthContext from '../contexts/AuthContext';
 import { FaCheck, FaTrashAlt } from 'react-icons/fa';
 import AlertModal from '../components/AlertModal';
 import PullRequestModal from '../components/PullRequestModal';
 import { useNavigate } from 'react-router-dom';
 import { unassign, updatePbiStatus } from '../services/api';
+import { isAssigned } from '../services/api';
 
 function Home() {
   const [isAlertVisible, setIsAlertVisible] = useState(true);
@@ -13,14 +14,29 @@ function Home() {
   const navigate = useNavigate();
   const authContext = useContext(AuthContext);
 
-  // Destructure authContext for easier access
-  const { username, pbiId, logout } = authContext || {};
+  const { username, pbiId, iframeUrl, logout, updatePbi } = authContext || {};
+
+  useEffect(() => {
+    const checkAssignment = async () => {
+      if (username) {
+        try {
+          const response = await isAssigned(username);
+          if (response.isAssigned) {
+            setIsAlertVisible(false);
+          } else {
+            setIsAlertVisible(true);
+          }
+        } catch (error) {
+          console.error('Error checking assignment:', error);
+        }
+      }
+    };    checkAssignment();
+  }, [username, pbiId, iframeUrl, updatePbi, logout, navigate]);
 
   const handleAccept = async () => {
-    //if (pbiId) {
-    if (true) {
+    if (pbiId) {
       try {
-        //await updatePbiStatus({ pbiId, status: 'in progress'});
+        await updatePbiStatus({ pbiId, status: 'in progress'});
         setIsAlertVisible(false);
       } catch (error) {
         console.error('Error updating PBI status:', error);
@@ -34,7 +50,7 @@ function Home() {
     if (username && pbiId) {
       try {
         await unassign({ username, pbiId });
-        authContext?.logout();
+        logout();
         navigate('/');
       } catch (error) {
         console.error('Error unassigning user:', error);
@@ -49,10 +65,9 @@ function Home() {
   };
 
   const handlePullRequestSubmit = async (link: string) => {
-    //if (pbiId) {
-    if (true) {
+    if (pbiId) {
       try {
-        //await updatePbiStatus({ pbiId, status: 'completed', urlPR: link });
+        await updatePbiStatus({ pbiId, status: 'in review', urlPR: link });
         setIsPullRequestModalVisible(false);
       } catch (error) {
         console.error('Error submitting pull request link:', error);
@@ -70,7 +85,7 @@ function Home() {
     if (username && pbiId) {
       try {
         await unassign({ username, pbiId });
-        authContext?.logout();
+        logout();
         navigate('/');
       } catch (error) {
         console.error('Error abandoning project:', error);
@@ -79,8 +94,6 @@ function Home() {
       console.error('Username and pbiId are not available in the auth context');
     }
   };
-
-  const IFRAME_SRC = `https://v2-embednotion.com/12e3386028bd8066a3afe385ed758696?p=${pbiId}`;
 
   return (
     <div className="min-h-screen bg-primary p-8 relative">
@@ -105,7 +118,7 @@ function Home() {
 
       <div className="mx-auto mt-10 mb-10">
         <iframe
-          src={IFRAME_SRC}
+          src={iframeUrl}
           className="w-full min-h-screen relative z-10"
           title="Home Content"
         />

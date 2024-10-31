@@ -3,9 +3,10 @@
 import os
 import aiohttp
 from datetime import timedelta, datetime
+from config import settings
 import logging
 
-NOTION_API_KEY = os.getenv("NOTION_API_KEY")
+NOTION_API_KEY = settings.NOTION_API_KEY
 NOTION_VERSION = "2022-06-28"
 
 async def update_notion_pbi(

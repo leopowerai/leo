@@ -2,11 +2,12 @@
 
 import asyncio
 import os
+from config import settings
 
 import aiohttp
 
-NOTION_API_KEY = os.getenv("NOTION_API_KEY")
-NOTION_PBI_DATABASE_ID = os.getenv("NOTION_PBI_DATABASE_ID")
+NOTION_API_KEY = settings.NOTION_API_KEY
+NOTION_PBI_DATABASE_ID = settings.NOTION_PBI_DATABASE_ID
 NOTION_VERSION = "2022-06-28"  # Use the latest supported version
 
 
@@ -38,9 +39,9 @@ async def get_filtered_pbis_for_student(session, student_username):
     # Define the statuses to filter for
     target_statuses = ["open", "in progress", "in review"]
     
-    url = f"https://api.notion.com/v1/databases/{os.getenv('NOTION_PBI_DATABASE_ID')}/query"
+    url = f"https://api.notion.com/v1/databases/{settings.NOTION_PBI_DATABASE_ID}/query"
     headers = {
-        "Authorization": f"Bearer {os.getenv('NOTION_API_KEY')}",
+        "Authorization": f"Bearer {settings.NOTION_API_KEY}",
         "Notion-Version": "2022-06-28",
         "Content-Type": "application/json",
     }

@@ -50,3 +50,20 @@ export const unassign = async(data: {  username : string; pbiId: string }) => {
 
   return await response.json();
 };
+
+export const isAssigned = async (username: string) => {
+  const response = await fetch(`${import.meta.env.VITE_API_URL}/is_assigned`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ username }),
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(errorData.message || 'Network response was not ok');
+  }
+
+  return await response.json(); // Expected to return { is_assigned: boolean }
+};

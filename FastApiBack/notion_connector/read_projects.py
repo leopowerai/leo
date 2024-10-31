@@ -2,11 +2,11 @@
 
 import asyncio
 import os
-
+from config import settings
 import aiohttp
 
-NOTION_API_KEY = os.getenv("NOTION_API_KEY")
-NOTION_PROJECT_DATABASE_ID = os.getenv("NOTION_PROJECT_DATABASE_ID")
+NOTION_API_KEY = settings.NOTION_API_KEY
+NOTION_PROJECT_DATABASE_ID = settings.NOTION_PROJECT_DATABASE_ID
 NOTION_VERSION = "2022-06-28"
 
 

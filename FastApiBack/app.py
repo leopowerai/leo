@@ -9,10 +9,9 @@ from fastapi.responses import JSONResponse
 from notion_connector.notion_handler import NotionHandler
 from notion_connector.update_pbi import update_notion_pbi
 from workflows import assign_workflow
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
 app = FastAPI()
-
-# load_dotenv()
 
 origins = [
     "http://localhost.tiangolo.com",
@@ -108,10 +107,10 @@ async def is_assigned_to_open_pbi(request: Request):
         )
         await notion_handler.close()
 
-        response_dict = {"is_assigned": is_assigned}
+        response_dict = {"isAssigned": is_assigned}
         return JSONResponse(content=response_dict, status_code=200)
     except Exception as e:
-        logging.error(f"Error processing is_assigned request: {e}")
+        logging.error(f"Error processing isAssigned request: {e}")
         raise HTTPException(
             status_code=500, detail="Error procesando la solicitud /is_assigned"
         )
