@@ -50,7 +50,7 @@ function Home() {
     if (username && pbiId) {
       try {
         await unassign({ username, pbiId });
-        logout();
+        authContext?.logout();
         navigate('/');
       } catch (error) {
         console.error('Error unassigning user:', error);
@@ -85,7 +85,7 @@ function Home() {
     if (username && pbiId) {
       try {
         await unassign({ username, pbiId });
-        logout();
+        authContext?.logout();
         navigate('/');
       } catch (error) {
         console.error('Error abandoning project:', error);

@@ -1,5 +1,5 @@
 // src/providers/AuthProvider.tsx
-import React, { useState, useEffect, ReactNode } from 'react';
+import  { useState, useEffect, ReactNode } from 'react';
 import AuthContext, { AuthContextType } from '../contexts/AuthContext';
 
 interface AuthProviderProps {
