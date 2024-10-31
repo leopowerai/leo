@@ -37,6 +37,7 @@ def submit():
 def unassign():
     data = request.get_json()
     student_username = data.get("username")
+    pbi_id = data.get("pbi_id")
 
     if not student_username:
         return jsonify({"error": "El campo 'username' es requerido"}), 400
@@ -127,4 +128,4 @@ def has_in_progress(username):
 
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5001)
+    app.run(host="0.0.0.0", port=5000)
