@@ -3,6 +3,7 @@
 import os
 import aiohttp
 from datetime import timedelta, datetime
+import logging
 
 NOTION_API_KEY = os.getenv("NOTION_API_KEY")
 NOTION_VERSION = "2022-06-28"
@@ -30,11 +31,12 @@ async def update_notion_pbi(
     if status:
         update_data["properties"]["status"] = {"status": {"name": status}}
 
-    # Update the owners if provided
-    if owners:
-        # Prepare the data for the multi-select update
-        updated_owners = [{"name": name} for name in owners]
-        update_data["properties"]["owners"] = {"multi_select": updated_owners}
+    if owners is not None:
+        if owners:  # If owners list is not empty
+            updated_owners = [{"name": name} for name in owners]
+            update_data["properties"]["owners"] = {"multi_select": updated_owners}
+        else:  # Clear the multi-select field by setting it to an empty list
+            update_data["properties"]["owners"] = {"multi_select": []}
 
     # Update the due date to one week from today if requested
     if update_due_date:
@@ -54,9 +56,10 @@ async def update_notion_pbi(
     async with session.patch(url, json=update_data, headers=headers) as response:
         if response.status == 200:
             data = await response.json()
-            print("Item updated successfully")
+            
+            logging.info("Item updated successfully")
             return True, data
         else:
             error_text = await response.text()
-            print("Failed to update item:", error_text)
+            logging.info("Failed to update item:", error_text)
             return False, None

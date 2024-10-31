@@ -37,6 +37,7 @@ def submit():
 def unassign():
     data = request.get_json()
     student_username = data.get("username")
+    pbi_id = data.get("pbi_id")
 
     if not student_username:
         return jsonify({"error": "El campo 'username' es requerido"}), 400

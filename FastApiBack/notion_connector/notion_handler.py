@@ -3,7 +3,7 @@
 import aiohttp
 from db_handler import BaseDBHandler
 from pbi_assigner import Status
-from notion_connector.read_pbis import read_notion_pbis_for_project
+from notion_connector.read_pbis import read_notion_pbis_for_project, get_filtered_pbis_for_student
 from notion_connector.read_projects import read_notion_projects
 from notion_connector.update_pbi import update_notion_pbi
 
@@ -119,3 +119,14 @@ class NotionHandler(BaseDBHandler):
             return Status(notion_status_str.lower().replace(" ", "_"))
         except ValueError:
             return None  # Or some default Status value if the string doesn't match
+    
+
+    async def is_student_assigned_to_open_pbi(self, student_username):
+        #TODO: This could be much more efficient if we filter the PBIs in the query itself
+        # Retrieve all PBIs for the given project
+        assigned_pbis = await get_filtered_pbis_for_student(self.session, student_username)
+
+        # If any PBIs are returned, the student is assigned to at least one PBI in those statuses
+        return bool(assigned_pbis)
+
+
