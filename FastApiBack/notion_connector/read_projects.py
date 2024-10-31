@@ -1,11 +1,13 @@
 # notion_connector/read_projects.py
 
 import os
+
 import aiohttp
 
-NOTION_API_KEY =  #os.getenv("NOTION_API_KEY")
-NOTION_PROJECT_DATABASE_ID =  #os.getenv("NOTION_PROJECT_DATABASE_ID")
+NOTION_API_KEY = os.getenv("NOTION_API_KEY")
+NOTION_PROJECT_DATABASE_ID = os.getenv("NOTION_PROJECT_DATABASE_ID")
 NOTION_VERSION = "2022-06-28"
+
 
 async def read_notion_projects(session):
     url = f"https://api.notion.com/v1/databases/{NOTION_PROJECT_DATABASE_ID}/query"

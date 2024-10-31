@@ -1,12 +1,14 @@
 # notion_connector/read_pbis.py
 
-import os
-import aiohttp
 import asyncio
+import os
 
-NOTION_API_KEY =  #os.getenv("NOTION_API_KEY")
-NOTION_PBI_DATABASE_ID =  # os.getenv("NOTION_PBI_DATABASE_ID")
+import aiohttp
+
+NOTION_API_KEY = os.getenv("NOTION_API_KEY")
+NOTION_PBI_DATABASE_ID = os.getenv("NOTION_PBI_DATABASE_ID")
 NOTION_VERSION = "2022-06-28"  # Use the latest supported version
+
 
 async def read_notion_pbis_for_project(session, project_id):
     url = f"https://api.notion.com/v1/databases/{NOTION_PBI_DATABASE_ID}/query"

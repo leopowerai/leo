@@ -1,15 +1,16 @@
 # app.py
-from fastapi import FastAPI, Request, HTTPException
-from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
 import logging
 import os
+
+# from dotenv import load_dotenv
+from fastapi import FastAPI, HTTPException, Request
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
 from workflows import assign_workflow
-from dotenv import load_dotenv
 
 app = FastAPI()
 
-load_dotenv()
+# load_dotenv()
 
 origins = [
     "http://localhost.tiangolo.com",
@@ -30,9 +31,10 @@ app.add_middleware(
 # Configure logging
 logging.basicConfig(level=logging.INFO)
 
+
 @app.post("/submit")
 async def submit(request: Request):
-    logging.info(f"Received request {os.getenv("NOTION_API_KEY")}")
+    logging.info("Received request")
     data = await request.json()
     platzi_url = data.get("username")
     github_url = data.get("githubUrl")

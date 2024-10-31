@@ -1,6 +1,9 @@
+import os
+
 NOTION_API_KEY = os.getenv("NOTION_API_KEY")
 NOTION_PROJECT_DATABASE_ID = os.getenv("NOTION_PROJECT_DATABASE_ID")
 NOTION_VERSION = "2022-06-28"
+
 
 async def create_pbi(self, **kwargs):
     """
