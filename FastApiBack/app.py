@@ -6,6 +6,7 @@ import os
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
+from notion_connector.update_pbi import update_notion_pbi
 from workflows import assign_workflow
 
 app = FastAPI()
@@ -46,3 +47,16 @@ async def submit(request: Request):
     except Exception as e:
         logging.error(f"Error processing submit request: {e}")
         raise HTTPException(status_code=500, detail="Error procesando la solicitud")
+
+
+@app.post("/unassign")
+async def unassign(request: Request):
+    data = await request.json()
+    student_username = data.get("username")
+    pbi_id = data.get("pbi_id")
+
+    if not student_username or pbi_id:
+        response_dict = {"error": "El campo 'username' y 'pbi_id' son requeridos"}
+        return JSONResponse(content=response_dict, status_code=400)
+
+    update_notion_pbi(pbi_id=pbi_id)
