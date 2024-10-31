@@ -3,6 +3,7 @@ import AuthContext from '../contexts/AuthContext';
 import { FaCheck, FaTrashAlt } from "react-icons/fa";
 import AlertModal from "../components/AlertModal";
 import { useNavigate } from "react-router-dom";
+import { updatePbiStatus } from '../services/api';
 //import KanbanBoard from '../components/KanbanBoard';
 
 const IFRAME_SRC =
@@ -13,9 +14,16 @@ function Home() {
   const navigate = useNavigate();
   const authContext = useContext(AuthContext);
 
-  const handleAccept = useCallback(() => {
-    setIsModalVisible(false);
-  }, []);
+  const handleAccept = async () => {
+    
+    if (authContext?.username) {
+      await updatePbiStatus({ username: authContext.username, status: "In Progress" });
+      setIsModalVisible(false);
+    } else {
+      console.error("Username is not available in the auth context");
+    }
+  };
+
 
   const handleCancel = useCallback(() => {
     setIsModalVisible(false);
@@ -25,7 +33,7 @@ function Home() {
 
   const handleComplete = useCallback(() => {
     // Implement the logic for marking the project as completed
-    console.log('Project marked as completed');
+    
   }, []);
 
   const handleAbandon = useCallback(() => {
