@@ -41,7 +41,7 @@ function Company() {
                 <InfoShow
                     title={projectData.companyName ?? ""}
                     content={projectData.companyContext ?? ""}
-                    cta={"¿Te gustaría hacer parte de nuestro equipo?" ?? ""}
+                    cta={"¿Te gustaría hacer parte de nuestro equipo?"}
                     onAccept={onAccept}
                     onCancel={onCancel}
                 />

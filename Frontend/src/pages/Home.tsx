@@ -11,7 +11,7 @@ function Home() {
   const navigate = useNavigate();
   const authContext = useContext(AuthContext);
 
-  const { username, pbiId, iframeUrl, logout, updatePbi } = authContext || {};
+  const { username, pbiId, iframeUrl } = authContext || {};
 
   const handleComplete = () => {
     setIsPullRequestModalVisible(true);

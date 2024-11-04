@@ -34,7 +34,7 @@ function PBI() {
                 <InfoShow
                     title={projectData.pbiTitle ?? ""}
                     content={projectData.pbiDescription ?? ""}
-                    cta={"Creemos que esta PBI es ideal para ti. ¿Aceptas esta misión?" ?? ""}
+                    cta={"Creemos que esta PBI es ideal para ti. ¿Aceptas esta misión?"}
                     onAccept={onAccept}
                     onCancel={onCancel}
                 />

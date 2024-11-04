@@ -34,8 +34,8 @@ function Project() {
             {projectData && (
                 <InfoShow
                     title={projectData.projectName ?? ""}
-                    content={projectData.projectBusinessContext + " " + projectData.projectTechnicalContext ?? ""}
-                    cta={"Hemos encontrado que tienes habilidades en " + projectData.projectSkills.join(', ') + ". ¿Te gustaría ser parte de este increible proyecto?" ?? ""}
+                    content={projectData.projectBusinessContext + " " + projectData.projectTechnicalContext}
+                    cta={"Hemos encontrado que tienes habilidades en " + projectData.projectSkills.join(', ') + ". ¿Te gustaría ser parte de este increible proyecto?"}
                     onAccept={onAccept}
                     onCancel={onCancel}
                 />
