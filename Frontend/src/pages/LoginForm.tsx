@@ -7,7 +7,7 @@ import { ApiError, submitForm } from '../services/api';
 import Leo from '/LEO loader.svg';
 import LeoPlatziLogo from '/LeoPlatzi.svg';
 
-const PLATZI_URL_REGEX = /^https:\/\/platzi\.com\/p\/[a-zA-Z0-9._-]{3,20}\/$/;
+const PLATZI_URL_REGEX = /^https:\/\/platzi\.com\/p\/[a-zA-Z0-9]+(?:[._-][a-zA-Z0-9]+)*\/$/;
 
 const validateUsername = (username: string): string => {
   if (!username) return 'Este campo es obligatorio';
@@ -101,9 +101,7 @@ const LoginForm = () => {
           projectTechnicalContext: response.projectTechnicalContext,
           companyName: response.companyName,
           companyContext: response.companyContext,
-          pbiTitle: response.pbiTitle,
-          pbiDescription: response.pbiDescription,
-          pbiSkills: response.pbiSkills,
+          suggestedPbis: response.suggestedPbis,
         };
         authContext?.login(username, response.pbiId, response.iframeUrl, projectData);
         navigate('/company');

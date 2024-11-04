@@ -1,6 +1,6 @@
 // src/pages/Home.tsx
 import { useContext, useState } from 'react';
-import { FaCheck, FaTrashAlt } from 'react-icons/fa';
+import { FaCheck, FaDiscord, FaTrashAlt } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
 import PullRequestModal from '../components/PullRequestModal';
 import AuthContext from '../contexts/AuthContext';
@@ -11,7 +11,7 @@ function Home() {
   const navigate = useNavigate();
   const authContext = useContext(AuthContext);
 
-  const { username, pbiId, iframeUrl } = authContext || {};
+  const { username, pbiId, iframeUrl, projectData } = authContext || {};
 
   const handleComplete = () => {
     setIsPullRequestModalVisible(true);
@@ -64,6 +64,15 @@ function Home() {
       >
         Ir al repositorio
       </button> */}
+
+      <a
+        href='https://discord.gg/CzHWvWUTdP'
+        className="absolute top-4 left-8 bg-blue-400 text-white px-4 py-2 rounded hover:bg-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-400 flex items-center whitespace-nowrap"
+        target='_blank'
+      >
+        <FaDiscord className="mr-2" />
+        Ir a la comunidad de {projectData?.projectName}
+      </a>
 
       <button
         onClick={handleComplete}
