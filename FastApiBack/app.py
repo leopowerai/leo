@@ -1,17 +1,43 @@
 # app.py
 import logging
-import os
+from contextlib import asynccontextmanager
 
-# from dotenv import load_dotenv
-from fastapi import FastAPI, HTTPException, Request
+from config import settings  # Load env vars
+from fastapi import Depends, FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from notion_connector.notion_handler import NotionHandler
 from notion_connector.update_pbi import update_notion_pbi
-from workflows import assign_workflow
-from pydantic_settings import BaseSettings, SettingsConfigDict
+from utils import remove_char
+from workflows.assign import assign_project_and_pbi
+from workflows.startup import preload_projects
 
-app = FastAPI()
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # Startup code
+    print("Running startup task...")
+    app.notion_handler = NotionHandler()  # This works in spite of MyPy error
+    app.project_assigner = await preload_projects(
+        app.notion_handler
+    )  # This works in spite of MyPy error
+
+    yield
+    # Shutdown code
+    print("Running shutdown task...")
+
+
+app = FastAPI(lifespan=lifespan)
+
+
+# Dependency to access notion_handler and project_assigner in endpoints
+def get_notion_handler(request: Request):
+    return request.app.notion_handler
+
+
+def get_project_assigner(request: Request):
+    return request.app.project_assigner
+
 
 origins = [
     "http://localhost.tiangolo.com",
@@ -21,7 +47,7 @@ origins = [
     "http://localhost:8080",
     "https://leofront.vercel.app",
     "https://vercel.com",
-    "*"
+    "*",
 ]
 
 app.add_middleware(
@@ -37,20 +63,44 @@ logging.basicConfig(level=logging.INFO)
 
 
 @app.post("/submit")
-async def submit(request: Request):
+async def submit(
+    request: Request,
+    project_assigner=Depends(get_project_assigner),
+):
     logging.info("Received request on /submit")
     data = await request.json()
     platzi_url = data.get("username")
-    github_url = data.get("githubUrl")
+    github_url = "https://github.com/someprofile"  # Placeholder for GitHub URL
 
     try:
-        response_dict, response_code = await assign_workflow(platzi_url, github_url)
+        notion_handler = NotionHandler()
+        # This can be more efficient, we need to evaluate this flow for checking if the student is already assigned to a PBI
+        student_username = platzi_url.rstrip("/").split("/")[-1]
+        # Check if the student is already assigned to a PBI
+        assigned_project_id, assigned_pbi_id = (
+            await notion_handler.is_student_assigned_to_open_pbi(student_username)
+        )
+        if assigned_project_id and assigned_pbi_id:
+            f_proj_id = remove_char(assigned_project_id, "-")
+            f_pbi_id = remove_char(assigned_pbi_id, "-")
+            response_dict = {
+                "isAssigned": "true",
+                "pbiId": assigned_pbi_id,
+                "iframeUrl": f"https://v2-embednotion.com/theffs/{f_proj_id}?p={f_pbi_id}&pm=s",
+            }
+
+            await notion_handler.close()
+            return JSONResponse(content=response_dict, status_code=200)
+
+        response_dict, response_code = await assign_project_and_pbi(
+            notion_handler, project_assigner, platzi_url, github_url
+        )
         return JSONResponse(content=response_dict, status_code=response_code)
 
     except Exception as e:
         logging.error(f"Error processing submit request: {e}")
         raise HTTPException(
-            status_code=500, detail="Error procesando la solicitud /submit"
+            status_code=500, detail="Error processing the /submit request"
         )
 
 
@@ -58,15 +108,16 @@ async def submit(request: Request):
 async def unassign(request: Request):
     logging.info("Received request on /unassign")
     data = await request.json()
-    student_username = data.get("username")
+    platzi_url = data.get("username")
     pbi_id = data.get("pbiId")
 
-    if not student_username or not pbi_id:
+    if not platzi_url or not pbi_id:
         response_dict = {"error": "El campo 'username' y 'pbiId' son requeridos"}
         return JSONResponse(content=response_dict, status_code=400)
 
     try:
         notion_handler = NotionHandler()
+        student_username = platzi_url.rstrip("/").split("/")[-1]
 
         # Set owners to an empty list to unassign the student
         success, result = await notion_handler.update_pbi(
@@ -105,13 +156,27 @@ async def is_assigned_to_open_pbi(request: Request):
 
     try:
         notion_handler = NotionHandler()
-        is_assigned = await notion_handler.is_student_assigned_to_open_pbi(
-            student_username
+        assigned_project_id, assigned_pbi_id = (
+            await notion_handler.is_student_assigned_to_open_pbi(student_username)
         )
         await notion_handler.close()
 
-        response_dict = {"isAssigned": is_assigned}
-        return JSONResponse(content=response_dict, status_code=200)
+        # logging.info(f"Assigned project ID: {assigned_project_id}")
+        # logging.info(f"Assigned PBI ID: {assigned_pbi_id}")
+        # Retornar el iframe para renderizar de una la tarea en curso
+        if assigned_project_id and assigned_pbi_id:
+            f_proj_id = remove_char(assigned_project_id, "-")
+            f_pbi_id = remove_char(assigned_pbi_id, "-")
+            response_dict = {
+                "isAssigned": "true",
+                "iframeUrl": f"https://v2-embednotion.com/theffs/{f_proj_id}?p={f_pbi_id}&pm=s",
+            }
+
+            return JSONResponse(content=response_dict, status_code=200)
+        else:
+            response_dict = {"isAssigned": "false"}
+            return JSONResponse(content=response_dict, status_code=400)
+
     except Exception as e:
         logging.error(f"Error processing isAssigned request: {e}")
         raise HTTPException(

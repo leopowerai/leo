@@ -17,13 +17,13 @@
 }
 
 /* Styles for input label inside the input */
-.peer-placeholder-shown ~ label {
+.peer-placeholder-shown~label {
   top: 3rem;
   left: 1rem;
 }
 
-.peer:focus ~ label,
-.peer:not(:placeholder-shown) ~ label {
+.peer:focus~label,
+.peer:not(:placeholder-shown)~label {
   top: 1rem;
   left: 0.3rem;
   font-size: 0.875rem;
@@ -35,18 +35,20 @@
 /* Loader animation for button */
 .loader-dots {
   display: inline-block;
-  animation: dots 1.5s infinite ease-in-out;
+  animation: dots 3s infinite ease-in-out;
 }
 
 @keyframes dots {
-  0%{
-    color: transparent;
+  0% {
+    color: rgba(255, 255, 255, 0.4);
   }
+
   50% {
-    color: #000;
+    color: #fff;
   }
+
   100% {
-    color: transparent;
+    color: rgba(255, 255, 255, 0.4);
   }
 }
 
@@ -61,4 +63,19 @@ input.border-red-500 {
 
 .text-red-500 {
   color: #e3342f;
+}
+
+@keyframes slow-spin {
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.slow-spin {
+  animation: slow-spin 3s linear infinite;
+  /* 3 seconds per rotation */
 }

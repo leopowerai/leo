@@ -2,7 +2,7 @@
 
 import aiohttp
 from db_handler import BaseDBHandler
-from pbi_assigner import Status
+from pbi_assignation.pbi_entities import Status
 from notion_connector.read_pbis import read_notion_pbis_for_project, get_filtered_pbis_for_student
 from notion_connector.read_projects import read_notion_projects
 from notion_connector.update_pbi import update_notion_pbi
@@ -10,7 +10,12 @@ from notion_connector.update_pbi import update_notion_pbi
 class NotionHandler(BaseDBHandler):
     def __init__(self):
         super().__init__()
+        # self.session = aiohttp.ClientSession()
+        self.session = self.open_session()
+    
+    def open_session(self):
         self.session = aiohttp.ClientSession()
+        return self.session
 
     async def close(self):
         await self.session.close()
@@ -42,15 +47,40 @@ class NotionHandler(BaseDBHandler):
         # Extract the project ID
         project_id = project.get("id", "No ID found")
 
-        # Extract the technologies
-        technologies_prop = project.get("properties", {}).get("technologies", {})
-        technologies = [tech["name"] for tech in technologies_prop.get("multi_select", [])]
+        # Extract the skills
+        skills_prop = project.get("properties", {}).get("skills", {})
+        skills = [tech["name"] for tech in skills_prop.get("multi_select", [])]
 
         # Extract the project name
         project_name_prop = project.get("properties", {}).get("project_name", {})
         project_name = project_name_prop.get("title", [{}])[0].get("plain_text", "No Name found")
 
-        return project_id, project_name, technologies
+        # Extract the company name (or default if not found)
+        company_prop = project.get("properties", {}).get("company", {})
+        company_name = company_prop.get("rich_text", [{}])[0].get("plain_text", "The Chill Company")
+
+        # Extract the business context
+        business_context_prop = project.get("properties", {}).get("business_context", {})
+        business_context = business_context_prop.get("rich_text", [{}])[0].get("plain_text", "")
+
+        # Extract the technical context
+        technical_context_prop = project.get("properties", {}).get("technical_context", {})
+        technical_context = technical_context_prop.get("rich_text", [{}])[0].get("plain_text", "")
+
+        # Extract the company context
+        company_context_prop = project.get("properties", {}).get("company_context", {})
+        company_context = company_context_prop.get("rich_text", [{}])[0].get("plain_text", "")
+
+        # Return all required fields
+        return (
+            project_id,
+            project_name,
+            skills,
+            business_context,
+            technical_context,
+            company_name,
+            company_context
+        )
 
     def _extract_pbi_info(self, pbi_data):
         # Extract the PBI ID
@@ -77,9 +107,9 @@ class NotionHandler(BaseDBHandler):
             pbi_data.get("properties", {}).get("story_points", {}).get("number", 0)
         )
 
-        # Stack (technologies)
+        # Stack (skills)
         stack_prop = (
-            pbi_data.get("properties", {}).get("technologies", {}).get("multi_select", [])
+            pbi_data.get("properties", {}).get("skills", {}).get("multi_select", [])
         )
         stack = [tech["name"] for tech in stack_prop]
 
@@ -122,11 +152,9 @@ class NotionHandler(BaseDBHandler):
     
 
     async def is_student_assigned_to_open_pbi(self, student_username):
-        #TODO: This could be much more efficient if we filter the PBIs in the query itself
-        # Retrieve all PBIs for the given project
-        assigned_pbis = await get_filtered_pbis_for_student(self.session, student_username)
+        assigned_project_id, assigned_pbi_id = await get_filtered_pbis_for_student(self.session, student_username)
 
         # If any PBIs are returned, the student is assigned to at least one PBI in those statuses
-        return bool(assigned_pbis)
+        return assigned_project_id, assigned_pbi_id
 
 

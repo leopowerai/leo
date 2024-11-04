@@ -1,14 +1,13 @@
-// src/pages/LoginForm.tsx
-import React, { useState, useContext } from 'react';
-import AuthContext from '../contexts/AuthContext';
-import { submitForm, ApiError } from '../services/api';
-import InputField from '../components/InputField';
-import Button from '../components/Button';
+import { useContext, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import Button from '../components/Button';
+import InputField from '../components/InputField';
+import AuthContext, { ProjectData } from '../contexts/AuthContext';
+import { ApiError, submitForm } from '../services/api';
+import Leo from '/LEO loader.svg';
 import LeoPlatziLogo from '/LeoPlatzi.svg';
 
 const PLATZI_URL_REGEX = /^https:\/\/platzi\.com\/p\/[a-zA-Z0-9._-]{3,20}\/$/;
-const GITHUB_URL_REGEX = /^https:\/\/github\.com\/[a-zA-Z0-9_-]{1,39}$/;
 
 const validateUsername = (username: string): string => {
   if (!username) return 'Este campo es obligatorio';
@@ -17,33 +16,50 @@ const validateUsername = (username: string): string => {
   return '';
 };
 
-const validateGithubUrl = (url: string): string => {
-  if (!url) return 'Este campo es obligatorio';
-  if (!GITHUB_URL_REGEX.test(url))
-    return 'Debe ingresar una URL válida de GitHub (https://github.com/usuario)';
-  return '';
-};
-
 interface ErrorState {
   username?: string;
-  githubUrl?: string;
   form?: string;
 }
 
+const funnyPhrasesAboutProjectManagers = ["Buscando tu proyecto ideal",
+  "Estamos analizando tu perfil",
+  "Leo ahora mismo está en el baño",
+  "Estamos tratando de buscar una asignación para ti",
+  "Parece que aun necesitas mas cursos",
+  "NUNCA PARES DE APRENDER!",
+]
+
 const LoginForm = () => {
   const [username, setUsername] = useState('');
-  const [githubUrl, setGithubUrl] = useState('');
+  const [funnyPhrase, setFunnyPhrase] = useState('');
   const [error, setError] = useState<ErrorState>({});
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const authContext = useContext(AuthContext);
+
+  useEffect(() => {
+    // Function to pick a random phrase
+    const pickRandomPhrase = () => {
+      const randomIndex = Math.floor(Math.random() * funnyPhrasesAboutProjectManagers.length);
+      setFunnyPhrase(funnyPhrasesAboutProjectManagers[randomIndex]);
+    };
+
+    // Pick an initial phrase
+    pickRandomPhrase();
+
+    // Set interval to pick a new phrase every 3 seconds
+    const intervalId = setInterval(pickRandomPhrase, 3000);
+
+    // Cleanup interval on component unmount
+    return () => clearInterval(intervalId);
+  }, []);
+
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     const newError: ErrorState = {
       username: validateUsername(username),
-      githubUrl: validateGithubUrl(githubUrl),
     };
 
     setError(newError);
@@ -55,9 +71,27 @@ const LoginForm = () => {
     setLoading(true);
 
     try {
-      const response = await submitForm({ username, githubUrl });
-      authContext?.login(username, response.pbiId, response.iframeUrl);
-      navigate('/home');
+      const response = await submitForm({ username });
+
+      if (response.isAssigned) {
+        authContext?.login(username, response.pbiId, response.iframeUrl);
+        navigate('/home');
+      } else {
+        const projectData: ProjectData = {
+          projectId: response.projectId,
+          projectName: response.projectName,
+          projectSkills: response.projectSkills,
+          projectBusinessContext: response.projectBusinessContext,
+          projectTechnicalContext: response.projectTechnicalContext,
+          companyName: response.companyName,
+          companyContext: response.companyContext,
+          pbiTitle: response.pbiTitle,
+          pbiDescription: response.pbiDescription,
+          pbiSkills: response.pbiSkills,
+        };
+        authContext?.login(username, response.pbiId, response.iframeUrl, projectData);
+        navigate('/company');
+      }
     } catch (error) {
       console.error('Error submitting form:', error);
 
@@ -81,51 +115,51 @@ const LoginForm = () => {
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen w-full bg-primary">
-      <div className="mb-4" style={{ width: '350px', height: 'auto' }}>
-        <img src={LeoPlatziLogo} alt="Logo de LeoPlatzi" />
-      </div>
-      <form onSubmit={handleSubmit} className="w-96">
-        <InputField
-          id="username"
-          type="text"
-          value={username}
-          onChange={(e) => {
-            const inputValue = e.target.value.replace(
-              'https://platzi.com/@',
-              'https://platzi.com/p/'
-            );
-            setUsername(inputValue);
-            setError((prevError) => ({
-              ...prevError,
-              username: validateUsername(inputValue),
-            }));
-          }}
-          label="URL Perfil Platzi"
-          error={error.username}
-          disabled={loading}
-        />
-        <InputField
-          id="githubUrl"
-          type="url"
-          value={githubUrl}
-          onChange={(e) => {
-            setGithubUrl(e.target.value);
-            setError((prevError) => ({
-              ...prevError,
-              githubUrl: validateGithubUrl(e.target.value),
-            }));
-          }}
-          label="URL Github"
-          error={error.githubUrl}
-          disabled={loading}
-        />
-        {error.form && (
-          <p className="text-red-500 text-sm mt-1 text-center">{error.form}</p>
-        )}
-        <Button type="submit" className="w-full p-3 mt-4">
-          {loading ? <span className="loader-dots">Cargando...</span> : 'Aceptar'}
-        </Button>
-      </form>
+      {loading ? (
+        // Loading state: display the Leo.svg logo
+        <div className="flex flex-col items-center">
+          <img src={Leo} alt="Loading Leo" className="w-28 h-28 slow-spin" />
+          <p className="text-white text-sm mt-1 text-center loader-dots">{funnyPhrase}</p>
+        </div>
+      ) : (
+        <>
+          <div className="mb-4" style={{ width: '350px', height: 'auto' }}>
+            <img src={LeoPlatziLogo} alt="Logo de LeoPlatzi" />
+          </div>
+          <form onSubmit={handleSubmit} className="w-96">
+            <p className="text-white text-sm mt-1 text-center mb-4">
+              Practica en un ambiente colaborativo
+              <br />
+              Tenemos un proyecto diseñado para lo que has aprendido
+            </p>
+            <InputField
+              id="username"
+              type="text"
+              value={username}
+              onChange={(e) => {
+                const inputValue = e.target.value.replace(
+                  'https://platzi.com/@',
+                  'https://platzi.com/p/'
+                );
+                setUsername(inputValue);
+                setError((prevError) => ({
+                  ...prevError,
+                  username: validateUsername(inputValue),
+                }));
+              }}
+              label="URL Perfil Platzi"
+              error={error.username}
+              disabled={loading}
+            />
+            {error.form && (
+              <p className="text-red-500 text-sm mt-1 text-center">{error.form}</p>
+            )}
+            <Button type="submit" className="w-full p-3 mt-4">
+              Aceptar
+            </Button>
+          </form>
+        </>
+      )}
     </div>
   );
 };

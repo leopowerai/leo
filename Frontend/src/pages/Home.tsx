@@ -1,64 +1,17 @@
 // src/pages/Home.tsx
-import { useState, useContext, useEffect } from 'react';
-import AuthContext from '../contexts/AuthContext';
+import { useContext, useState } from 'react';
 import { FaCheck, FaTrashAlt } from 'react-icons/fa';
-import AlertModal from '../components/AlertModal';
-import PullRequestModal from '../components/PullRequestModal';
 import { useNavigate } from 'react-router-dom';
+import PullRequestModal from '../components/PullRequestModal';
+import AuthContext from '../contexts/AuthContext';
 import { unassign, updatePbiStatus } from '../services/api';
-import { isAssigned } from '../services/api';
 
 function Home() {
-  const [isAlertVisible, setIsAlertVisible] = useState(true);
   const [isPullRequestModalVisible, setIsPullRequestModalVisible] = useState(false);
   const navigate = useNavigate();
   const authContext = useContext(AuthContext);
 
   const { username, pbiId, iframeUrl, logout, updatePbi } = authContext || {};
-
-  useEffect(() => {
-    const checkAssignment = async () => {
-      if (username) {
-        try {
-          const response = await isAssigned(username);
-          if (response.isAssigned) {
-            setIsAlertVisible(false);
-          } else {
-            setIsAlertVisible(true);
-          }
-        } catch (error) {
-          console.error('Error checking assignment:', error);
-        }
-      }
-    };    checkAssignment();
-  }, [username, pbiId, iframeUrl, updatePbi, logout, navigate]);
-
-  const handleAccept = async () => {
-    if (pbiId) {
-      try {
-        await updatePbiStatus({ pbiId, status: 'in progress'});
-        setIsAlertVisible(false);
-      } catch (error) {
-        console.error('Error updating PBI status:', error);
-      }
-    } else {
-      console.error('pbiId is not available in the auth context');
-    }
-  };
-
-  const handleCancel = async () => {
-    if (username && pbiId) {
-      try {
-        await unassign({ username, pbiId });
-        authContext?.logout();
-        navigate('/');
-      } catch (error) {
-        console.error('Error unassigning user:', error);
-      }
-    } else {
-      console.error('Username and pbiId are not available in the auth context');
-    }
-  };
 
   const handleComplete = () => {
     setIsPullRequestModalVisible(true);
@@ -97,9 +50,6 @@ function Home() {
 
   return (
     <div className="min-h-screen bg-primary p-8 relative">
-      {isAlertVisible && (
-        <AlertModal onAccept={handleAccept} onCancel={handleCancel} />
-      )}
 
       {isPullRequestModalVisible && (
         <PullRequestModal

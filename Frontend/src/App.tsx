@@ -1,17 +1,28 @@
 // src/App.tsx
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import AuthProvider from './providers/AuthProvider';
-import AuthContext from './contexts/AuthContext';
-import LoginForm from './pages/LoginForm';
-import Home from './pages/Home';
+import { Navigate, Route, BrowserRouter as Router, Routes } from 'react-router-dom';
 import './App.css';
+import AuthContext from './contexts/AuthContext';
+import Company from './pages/Company';
+import Home from './pages/Home';
+import LoginForm from './pages/LoginForm';
+import PBI from './pages/PBI';
+import Project from './pages/Project';
+import AuthProvider from './providers/AuthProvider';
 
 function App() {
   return (
     <AuthProvider>
       <Router>
         <Routes>
+          <Route
+            path="/"
+            element={
+              <PublicRoute>
+                <LoginForm />
+              </PublicRoute>
+            }
+          />
           <Route
             path="/home"
             element={
@@ -21,14 +32,30 @@ function App() {
             }
           />
           <Route
-            path="/"
+            path="/company"
             element={
-              <PublicRoute>
-                <LoginForm />
-              </PublicRoute>
+              <PrivateRoute>
+                <Company />
+              </PrivateRoute>
             }
-          />   
-          <Route path="*" element={<Navigate to="/" />} />       
+          />
+          <Route
+            path="/project"
+            element={
+              <PrivateRoute>
+                <Project />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/pbi"
+            element={
+              <PrivateRoute>
+                <PBI />
+              </PrivateRoute>
+            }
+          />
+          <Route path="*" element={<Navigate to="/" />} />
         </Routes>
       </Router>
     </AuthProvider>

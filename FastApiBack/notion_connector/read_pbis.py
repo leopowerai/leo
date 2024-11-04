@@ -1,10 +1,6 @@
 # notion_connector/read_pbis.py
 
-import asyncio
-import os
 from config import settings
-
-import aiohttp
 
 NOTION_API_KEY = settings.NOTION_API_KEY
 NOTION_PBI_DATABASE_ID = settings.NOTION_PBI_DATABASE_ID
@@ -64,16 +60,8 @@ async def get_filtered_pbis_for_student(session, student_username):
         ]
     }
 
-    # Make the request to Notion
-    async with session.post(url, json={"filter": filters}, headers=headers) as response:
-        if response.status == 200:
-            data = await response.json()
-            pbis = data.get("results", [])
-            return pbis
-        else:
-            error_text = await response.text()
-            raise Exception(f"Error fetching PBIs: {response.status}, {error_text}")
-
+    # Log the filter for debugging
+    # logging.info("Requesting PBIs with filters: %s", filters)
 
     # Make the request to Notion
     async with session.post(url, json={"filter": filters}, headers=headers) as response:
@@ -81,12 +69,17 @@ async def get_filtered_pbis_for_student(session, student_username):
             data = await response.json()
             pbis = data.get("results", [])
             
-            # Filter PBIs to check if they are assigned to the student
-            assigned_pbis = [
-                pbi for pbi in pbis
-                if student_username in [owner.get("name") for owner in pbi.get("owners", [])]
-            ]
-            return assigned_pbis
+            # Log the PBIs fetched for debugging
+            # logging.info("Fetched PBIs: %s", pbis)
+
+            if len(pbis) == 0:
+                return None, None
+            
+            # Get the project ID for the first PBI
+            assigned_pbi_id = pbis[0].get("id")
+            assigned_project_id = pbis[0]['properties'].get('projects_test', {}).get('relation', [{}])[0].get('id')
+            return assigned_project_id, assigned_pbi_id
         else:
             error_text = await response.text()
-            raise Exception(f"Error fetching PBIs: {response.status}, {error_text}")
+            # logging.info("Error fetching PBIs: %d, %s", response.status, error_text)
+            return None, None
