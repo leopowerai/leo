@@ -12,7 +12,8 @@ const PLATZI_URL_REGEX = /^https:\/\/platzi\.com\/p\/[a-zA-Z0-9._-]{3,20}\/$/;
 const validateUsername = (username: string): string => {
   if (!username) return 'Este campo es obligatorio';
   if (!PLATZI_URL_REGEX.test(username))
-    return 'La URL debe seguir el formato: https://platzi.com/p/usuario/';
+    return '';
+  //return 'La URL debe seguir el formato: https://platzi.com/p/usuario/';
   return '';
 };
 
