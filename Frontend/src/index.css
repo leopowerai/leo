@@ -79,3 +79,7 @@ input.border-red-500 {
   animation: slow-spin 3s linear infinite;
   /* 3 seconds per rotation */
 }
+
+.transition-max-height {
+  transition: max-height 0.5s ease-in-out;
+}

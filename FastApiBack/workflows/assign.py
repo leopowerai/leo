@@ -10,7 +10,12 @@ from project_assignation.project_entities import Project, ProjectAssigner
 
 
 # TODO: This func should be split into two functions (one for the project assigner and one for the PBI assigner)
-async def assign_project_and_pbi(notion_handler: NotionHandler, project_assigner: ProjectAssigner, platzi_url, github_url):
+async def assign_project_and_pbi(notion_handler: NotionHandler,
+                                 project_assigner: ProjectAssigner,
+                                 platzi_url, 
+                                 github_url,
+                                 recommended_pbis_count = 1):
+    
     logging.info("Assign workflow started")
 
     notion_handler.open_session()
@@ -71,52 +76,54 @@ async def assign_project_and_pbi(notion_handler: NotionHandler, project_assigner
         )
 
         logging.info(f"Assigning PBI to {student.platzi_username}")
-        recommended_pbis = await pbi_assigner.find_matching_task(course_embeddings)
-        if(len(recommended_pbis) == 0):
+        scored_pbis = await pbi_assigner.find_matching_task(course_embeddings)
+        if (len(scored_pbis) == 0):
             message = "No se encontraron PBIs recomendados"
             logging.info(message)
             response_dict = {"message": message}
             response_code = 400
             return response_dict, response_code
         
-        selected_pbi = max(recommended_pbis, key=lambda x: x[1])[0]
+        # selected_pbi = max(recommended_pbis, key=lambda x: x[1])[0]
         # print(f"Recommended PBI: {recommended_pbis[0][0].title}")
         # print(f"Recommended PBI: {recommended_pbis[1][0].title}")
         # print(f"Recommended PBI: {recommended_pbis[2][0].title}")
-
-        if selected_pbi:
-            await pbi_assigner.assign_pbi_to_student(selected_pbi)
-            message = f"Se asignó el PBI: {selected_pbi.title}"
-            print(message)
-            logging.info(message)
-            f_project_id = remove_char(selected_project.id, "-")
-            f_pbi_id = remove_char(selected_pbi.id, "-")
-
-            logging.info(selected_pbi)
-
-            response_dict = {
-                "message": message,
-                "projectId": selected_project.id,
-                "projectName": selected_project.name,
-                "projectSkills": selected_project.skills,
-                "projectBusinessContext": selected_project.business_context,
-                "projectTechnicalContext": selected_project.technical_context,
-                "companyName": selected_project.company_name,
-                "companyContext": selected_project.company_context,
-                "pbiTitle": selected_pbi.title,
-                "pbiDescription": selected_pbi.description,
-                "pbiSkills": selected_pbi.skills,
-                "pbiId": selected_pbi.id,
-                "iframeUrl": f"https://v2-embednotion.com/theffs/{f_project_id}?p={f_pbi_id}&pm=s",
+        if (recommended_pbis_count > len(scored_pbis)):
+            recommended_pbis_count = len(scored_pbis)
+        
+        recommended_pbis = []
+        for i in range(recommended_pbis_count):
+            rec_pbi = {
+                "pbiId": remove_char(scored_pbis[i][0].id, "-"),
+                "pbiTitle": scored_pbis[i][0].title,
+                "pbiDescription": scored_pbis[i][0].description,
+                "pbiSkills": scored_pbis[i][0].skills,
+                "pbiScore": scored_pbis[i][1]*100
             }
-            response_code = 200
-            return response_dict, response_code
-        else:
-            message = "No se encontró PBI para asignar"
-            logging.info(message)
-            response_dict = {"error": message}
-            response_code = 400
-            return response_dict, response_code
+            recommended_pbis.append(rec_pbi)
+
+        # El proceso de seleccion de PBI ahora se hace por aparte
+
+        # await pbi_assigner.assign_pbi_to_student(selected_pbi)
+        # message = f"Se asignó el PBI: {selected_pbi.title}"
+        # print(message)
+        # logging.info(message)
+        f_project_id = remove_char(selected_project.id, "-")
+
+        response_dict = {
+            "message": "Se asigno el proyecto y se sugirieron los PBIs",
+            "projectId": f_project_id,
+            "projectName": selected_project.name,
+            "projectSkills": selected_project.skills,
+            "projectBusinessContext": selected_project.business_context,
+            "projectTechnicalContext": selected_project.technical_context,
+            "companyName": selected_project.company_name,
+            "companyContext": selected_project.company_context,
+            "suggestedPbis": [dict(pbi) for pbi in recommended_pbis]
+            # "iframeUrl": f"https://v2-embednotion.com/theffs/{f_project_id}?p={f_pbi_id}&pm=s",
+        }
+        response_code = 200
+        return response_dict, response_code
 
     finally:
         await notion_handler.close()

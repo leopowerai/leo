@@ -94,8 +94,13 @@ async def submit(
             return JSONResponse(content=response_dict, status_code=200)
 
         response_dict, response_code = await assign_project_and_pbi(
-            notion_handler, project_assigner, platzi_url, github_url
+            notion_handler,
+            project_assigner,
+            platzi_url,
+            github_url,
+            recommended_pbis_count=3,
         )
+
         return JSONResponse(content=response_dict, status_code=response_code)
 
     except Exception as e:
@@ -142,6 +147,44 @@ async def unassign(request: Request):
         logging.error(f"Error processing unassign request: {e}")
         raise HTTPException(
             status_code=500, detail="Error procesando la solicitud /unassign"
+        )
+
+
+@app.post("/assign")
+async def assign(request: Request):
+    logging.info("Received request on /assign")
+    data = await request.json()
+    platzi_url = data.get("username")
+    pbi_id = data.get("pbiId")
+
+    if not platzi_url or not pbi_id:
+        response_dict = {"error": "El campo 'username' y 'pbiId' son requeridos"}
+        return JSONResponse(content=response_dict, status_code=400)
+
+    try:
+        notion_handler = NotionHandler()
+        student_username = platzi_url.rstrip("/").split("/")[-1]
+
+        # Assign the student to the PBI
+        success, result = await notion_handler.update_pbi(
+            pbi_id, owners=[student_username], status="in progress"
+        )
+
+        await notion_handler.close()
+
+        if success:
+            response_dict = {
+                "message": f"Estudiante {student_username} asignado exitosamente"
+            }
+            return JSONResponse(content=response_dict, status_code=200)
+        else:
+            response_dict = {"error": f"Error asignando estudiante {student_username}"}
+            return JSONResponse(content=response_dict, status_code=400)
+
+    except Exception as e:
+        logging.error(f"Error processing assign request: {e}")
+        raise HTTPException(
+            status_code=500, detail="Error procesando la solicitud /assign"
         )
 
 
