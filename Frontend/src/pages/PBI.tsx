@@ -7,7 +7,7 @@ function PBI() {
 
     const navigate = useNavigate();
     const authContext = useContext(AuthContext);
-    const { projectData, username, pbiId } = authContext || {};
+    const { projectData } = authContext || {};
 
     const onClick = () => {
         navigate('/home');
