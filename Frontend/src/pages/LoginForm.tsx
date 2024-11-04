@@ -22,12 +22,27 @@ interface ErrorState {
   form?: string;
 }
 
-const funnyPhrasesAboutProjectManagers = ["Buscando tu proyecto ideal",
-  "Estamos analizando tu perfil",
-  "Leo ahora mismo está en el baño",
-  "Estamos tratando de buscar una asignación para ti",
-  "Parece que aun necesitas mas cursos",
-  "NUNCA PARES DE APRENDER!",
+const funnyPhrasesAboutProjectManagers = ["Afinando tu match perfecto",
+  "Casi lo tenemos...",
+  "Algo increíble se acerca",
+  "Analizando las mejores opciones",
+  "Trabajando en tu futuro...",
+  "¡Tu próximo reto está cerca!",
+  "Encontrando tu lugar ideal",
+  "Un paso más cerca...",
+  "Tu proyecto está en camino",
+  "Preparando tu siguiente aventura",
+  "Estamos buscando un proyecto para ti",
+  "Rastreando oportunidades para ti",
+  "Personalizando tu experiencia",
+  "Tu talento merece lo mejor",
+  "Optimizando tu asignación",
+  "Ajustando parámetros",
+  "Afinando detalles",
+  "Potenciando tu talento",
+  "Estudiando alternativas",
+  "Creando tu camino",
+
 ]
 
 const LoginForm = () => {
