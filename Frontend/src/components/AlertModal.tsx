@@ -15,7 +15,7 @@ const AlertModal: React.FC<AlertModalProps> = ({ onAccept, onCancel }) => {
     >
       <Draggable>
         <div className="bg-white p-6 rounded shadow-lg w-96 text-center">
-          <h2 className="text-xl font-semibold mb-4">¿Aceptas tu misión?</h2>
+
           <div className="flex justify-between mt-6">
             <button
               onClick={onCancel}

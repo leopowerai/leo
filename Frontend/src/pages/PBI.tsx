@@ -1,8 +1,7 @@
 import { useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
-import InfoShow from '../components/InfoShow';
+import Card from '../components/Card';
 import AuthContext from '../contexts/AuthContext';
-import { unassign } from '../services/api';
 
 function PBI() {
 
@@ -10,35 +9,21 @@ function PBI() {
     const authContext = useContext(AuthContext);
     const { projectData, username, pbiId } = authContext || {};
 
-    const onAccept = () => {
+    const onClick = () => {
         navigate('/home');
     };
 
-    const onCancel = async () => {
-        if (username && pbiId) {
-            try {
-                await unassign({ username, pbiId });
-                authContext?.logout();
-                navigate('/');
-            } catch (error) {
-                console.error('Error abandoning project:', error);
-            }
-        } else {
-            console.error('Username and pbiId are not available in the auth context');
-        }
-    };
-
     return (
-        <div className="min-h-screen bg-primary p-8 flex items-center justify-center text-white">
+        <div className="flex flex-col items-center justify-center min-h-screen w-full bg-primary">
+            <h1 className='fond-bold text-xl text-white mb-4 mt-4 '>Selecciona la tarea que más te guste</h1>
             {projectData && (
-                <InfoShow
-                    title={projectData.pbiTitle ?? ""}
-                    content={projectData.pbiDescription ?? ""}
-                    cta={"Creemos que esta PBI es ideal para ti. ¿Aceptas esta misión?"}
-                    onAccept={onAccept}
-                    onCancel={onCancel}
-                />
-            )}
+                <div>
+                    {projectData.suggestedPbis.map(pbi => (
+                        <Card onClick={onClick} title={pbi.pbiTitle} description={pbi.pbiDescription} />
+                    ))}
+                </div>
+            )
+            }
         </div>
     );
 }

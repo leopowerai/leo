@@ -1,6 +1,13 @@
 // src/contexts/AuthContext.ts
 import { createContext } from 'react';
 
+interface PBIData {
+  pbiId: string;
+  pbiTitle: string;
+  pbiDescription: string;
+  pbiSkills: string[];
+}
+
 interface ProjectData {
   projectId: string;
   projectName: string;
@@ -9,9 +16,7 @@ interface ProjectData {
   projectTechnicalContext: string;
   companyName: string;
   companyContext: string;
-  pbiTitle: string;
-  pbiDescription: string;
-  pbiSkills: string[];
+  suggestedPbis: PBIData[];
 }
 
 interface AuthContextType {
