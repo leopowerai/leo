@@ -40,19 +40,20 @@ def get_project_assigner(request: Request):
 
 
 origins = [
-    "http://localhost.tiangolo.com",
-    "https://localhost.tiangolo.com",
     "http://localhost",
     "http://localhost:5173",
     "http://localhost:8080",
-    "https://leofront.vercel.app",
-    "https://vercel.com",
-    "*",
+    "44.226.145.213",
+    "54.187.200.255",
+    "34.213.214.55",
+    "35.164.95.156",
+    "44.230.95.183",
+    "44.229.200.200",
 ]
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
