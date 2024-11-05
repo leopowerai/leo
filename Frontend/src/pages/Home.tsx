@@ -89,7 +89,7 @@ function Home() {
         className="absolute top-4 right-8 bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-400 flex items-center whitespace-nowrap"
       >
         <FaCheck className="mr-2" />
-        Adjuntar Pull Request Link
+        Adjuntar Resultados
       </button>
 
       <div className="mx-auto mt-10 mb-10">

@@ -11,11 +11,6 @@ const PullRequestModal: React.FC<PullRequestModalProps> = ({ onSubmit, onCancel 
   const [link, setLink] = useState('');
 
   const handleSubmit = () => {
-    const githubPRRegex = /^https:\/\/github\.com\/.+\/.+\/pull\/\d+$/;
-    if (!githubPRRegex.test(link)) {
-      alert('Por favor, ingresa un enlace válido de Pull Request de GitHub.');
-      return;
-    }
     onSubmit(link);
     setLink('');
   };
@@ -34,7 +29,6 @@ const PullRequestModal: React.FC<PullRequestModalProps> = ({ onSubmit, onCancel 
             type="url"
             value={link}
             onChange={(e) => setLink(e.target.value)}
-            placeholder="https://github.com/usuario/repositorio/pull/123"
             className="w-full p-2 border border-gray-300 rounded mb-4 focus:outline-none focus:ring-2 focus:ring-green-400"
           />
           <div className="flex justify-between mt-6">
