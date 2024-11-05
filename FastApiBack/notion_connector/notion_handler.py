@@ -56,7 +56,7 @@ class NotionHandler(BaseDBHandler):
         project_name = project_name_prop.get("title", [{}])[0].get("plain_text", "No Name found")
 
         # Extract the company name (or default if not found)
-        company_prop = project.get("properties", {}).get("company", {})
+        company_prop = project.get("properties", {}).get("company_name", {})
         company_name = company_prop.get("rich_text", [{}])[0].get("plain_text", "The Chill Company")
 
         # Extract the business context

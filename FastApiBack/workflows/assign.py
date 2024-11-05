@@ -77,6 +77,9 @@ async def assign_project_and_pbi(notion_handler: NotionHandler,
 
         logging.info(f"Assigning PBI to {student.platzi_username}")
         scored_pbis = await pbi_assigner.find_matching_task(course_embeddings)
+
+        # str_pbis = [(pbi[0].title, pbi[1]) for pbi in scored_pbis]
+        # logging.info(f"PBIs scored: {str_pbis}")
         if (len(scored_pbis) == 0):
             message = "No se encontraron PBIs recomendados"
             logging.info(message)

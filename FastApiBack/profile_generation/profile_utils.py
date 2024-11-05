@@ -48,7 +48,7 @@ def convert_js_to_json(data_string):
     gpt_result = response.choices[0].message.content
     json_result = extract_json(gpt_result)
     
-    logging.info(f"Scrapped data: {json_result}")
+    # logging.info(f"Scrapped data: {json_result}")
     return json_result
 
 # Function to extract JSON from response text

@@ -104,6 +104,8 @@ class PBIAssigner:
             # Generate embeddings for each requirement in the task
             requirement_embeddings = [get_embedding(
                 tech) for tech in pbi.skills]
+        
+            # requirement_embeddings.append(get_embedding(pbi.title))
 
             # Calculate similarity scores between each course and each task requirement
             scores = [

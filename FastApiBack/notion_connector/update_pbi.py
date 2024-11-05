@@ -15,7 +15,7 @@ async def update_notion_pbi(
     status=None,
     owners=None,
     update_due_date=False,
-    url_pr=None,
+    results_url=None,
     feedback=None,
 ):
     url = f"https://api.notion.com/v1/pages/{pbi_id}"
@@ -41,12 +41,12 @@ async def update_notion_pbi(
 
     # Update the due date to one week from today if requested
     if update_due_date:
-        due_date = (datetime.today() + timedelta(weeks=1)).strftime("%Y-%m-%d")
+        due_date = (datetime.today() + timedelta(weeks=2)).strftime("%Y-%m-%d")
         update_data["properties"]["final_date"] = {"date": {"start": due_date}}
 
     # Update the URL if provided
-    if url_pr:
-        update_data["properties"]["url_pr"] = {"url": url_pr}
+    if results_url:
+        update_data["properties"]["results_url"] = {"url": results_url}
 
     # Update the feedback if provided
     if feedback:
@@ -58,7 +58,7 @@ async def update_notion_pbi(
         if response.status == 200:
             data = await response.json()
             
-            logging.info("Item updated successfully")
+            logging.info(f"Item updated successfully")
             return True, data
         else:
             error_text = await response.text()

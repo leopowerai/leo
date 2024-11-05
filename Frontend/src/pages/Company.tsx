@@ -2,7 +2,6 @@ import { useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import InfoShow from '../components/InfoShow';
 import AuthContext from '../contexts/AuthContext';
-import { unassign } from '../services/api';
 
 
 
@@ -14,7 +13,7 @@ function Company() {
         navigate('/');
     }
 
-    const { projectData, username, pbiId } = authContext || {};
+    const { projectData } = authContext || {};
 
     const onAccept = async () => {
         navigate('/project');
@@ -22,17 +21,8 @@ function Company() {
 
 
     const onCancel = async () => {
-        if (username && pbiId) {
-            try {
-                await unassign({ username, pbiId });
-                authContext?.logout();
-                navigate('/');
-            } catch (error) {
-                console.error('Error abandoning project:', error);
-            }
-        } else {
-            console.error('Username and pbiId are not available in the auth context');
-        }
+        authContext?.logout();
+        navigate('/');
     };
 
     return (
