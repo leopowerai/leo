@@ -1,20 +1,21 @@
-import { useContext, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Button from '../components/Button';
 import InputField from '../components/InputField';
-import AuthContext, { ProjectData } from '../contexts/AuthContext';
+import LoadingIndicator from '../components/LoadingIndicator';
+import useAuth from '../hooks/useAuth';
 import { ApiError, submitForm } from '../services/api';
-import Leo from '/LEO loader.svg';
+import { ProjectData } from '../types/auth';
 import LeoPlatziLogo from '/LeoPlatzi.svg';
 
 const PLATZI_URL_REGEX = /^https:\/\/platzi\.com\/p\/[a-zA-Z0-9]+(?:[._-][a-zA-Z0-9]+)*\/$/;
 
-const validateUsername = (username: string): string => {
+const validateUsername = (username: string): string | undefined => {
   if (!username) return 'Este campo es obligatorio';
-  if (!PLATZI_URL_REGEX.test(username))
-    return '';
-  //return 'La URL debe seguir el formato: https://platzi.com/p/usuario/';
-  return '';
+  if (!PLATZI_URL_REGEX.test(username)) {
+    return 'La URL debe seguir el formato: https://platzi.com/p/usuario/';
+  }
+  return undefined;
 };
 
 interface ErrorState {
@@ -22,7 +23,7 @@ interface ErrorState {
   form?: string;
 }
 
-const funnyPhrasesAboutProjectManagers = ["Afinando tu match perfecto",
+const funnyPhrases = ["Afinando tu match perfecto",
   "Casi lo tenemos...",
   "Algo increíble se acerca",
   "Analizando las mejores opciones",
@@ -42,47 +43,31 @@ const funnyPhrasesAboutProjectManagers = ["Afinando tu match perfecto",
   "Potenciando tu talento",
   "Estudiando alternativas",
   "Creando tu camino",
-
 ]
 
-const LoginForm = () => {
+const LoginForm: React.FC = () => {
   const [username, setUsername] = useState('');
   const [funnyPhrase, setFunnyPhrase] = useState('');
   const [error, setError] = useState<ErrorState>({});
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
-  const authContext = useContext(AuthContext);
+  const authContext = useAuth();
 
   useEffect(() => {
-    // Function to pick a random phrase
     const pickRandomPhrase = () => {
-      const randomIndex = Math.floor(Math.random() * funnyPhrasesAboutProjectManagers.length);
-      setFunnyPhrase(funnyPhrasesAboutProjectManagers[randomIndex]);
+      const randomIndex = Math.floor(Math.random() * funnyPhrases.length);
+      setFunnyPhrase(funnyPhrases[randomIndex]);
     };
-
-    // Pick an initial phrase
     pickRandomPhrase();
-
-    // Set interval to pick a new phrase every 3 seconds
     const intervalId = setInterval(pickRandomPhrase, 3000);
-
-    // Cleanup interval on component unmount
     return () => clearInterval(intervalId);
   }, []);
 
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
-    const newError: ErrorState = {
-      username: validateUsername(username),
-    };
-
-    setError(newError);
-
-    const hasError = Object.values(newError).some((err) => err);
-
-    if (hasError) return;
+    const usernameError = validateUsername(username);
+    setError({ username: usernameError });
+    if (usernameError) return;
 
     setLoading(true);
 
@@ -90,39 +75,24 @@ const LoginForm = () => {
       const response = await submitForm({ username });
 
       if (response.isAssigned) {
-        authContext?.login(username, response.pbiId, response.iframeUrl);
+        authContext.login(username, response.pbiId, response.iframeUrl);
         navigate('/home');
       } else {
-        const projectData: ProjectData = {
-          projectId: response.projectId,
-          projectName: response.projectName,
-          projectSkills: response.projectSkills,
-          projectBusinessContext: response.projectBusinessContext,
-          projectTechnicalContext: response.projectTechnicalContext,
-          companyName: response.companyName,
-          companyContext: response.companyContext,
-          suggestedPbis: response.suggestedPbis,
-        };
-        authContext?.login(username, response.pbiId, response.iframeUrl, projectData);
+        const projectData = response as ProjectData; // Ensure response matches ProjectData
+        authContext.login(username, response.pbiId, response.iframeUrl, projectData);
         navigate('/company');
       }
-    } catch (error) {
-      console.error('Error submitting form:', error);
-
+    } catch (err) {
+      console.error('Error submitting form:', err);
       let errorMessage = 'Hubo un error al enviar el formulario. Inténtalo nuevamente.';
-
-      if (error instanceof ApiError) {
-        errorMessage = error.message;
-      } else if (error instanceof Error) {
-        errorMessage = error.message;
-      } else if (typeof error === 'string') {
-        errorMessage = error;
+      if (err instanceof ApiError) {
+        errorMessage = err.message;
       }
-
       setError((prevError) => ({
         ...prevError,
         form: errorMessage,
       }));
+    } finally {
       setLoading(false);
     }
   };
@@ -130,11 +100,7 @@ const LoginForm = () => {
   return (
     <div className="flex flex-col items-center justify-center min-h-screen w-full bg-primary">
       {loading ? (
-        // Loading state: display the Leo.svg logo
-        <div className="flex flex-col items-center">
-          <img src={Leo} alt="Loading Leo" className="w-28 h-28 slow-spin" />
-          <p className="text-white text-sm mt-1 text-center loader-dots">{funnyPhrase}</p>
-        </div>
+        <LoadingIndicator message={funnyPhrase} />
       ) : (
         <>
           <div className="mb-4" style={{ width: '350px', height: 'auto' }}>
@@ -168,7 +134,7 @@ const LoginForm = () => {
             {error.form && (
               <p className="text-red-500 text-sm mt-1 text-center">{error.form}</p>
             )}
-            <Button type="submit" className="w-full p-3 mt-4">
+            <Button variant='secondary' type="submit" className="w-full p-3 mt-4">
               Aceptar
             </Button>
           </form>

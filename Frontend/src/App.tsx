@@ -1,87 +1,71 @@
 // src/App.tsx
-import React from 'react';
+import React, { Suspense } from 'react';
 import { Navigate, Route, BrowserRouter as Router, Routes } from 'react-router-dom';
 import './App.css';
-import AuthContext from './contexts/AuthContext';
-import Company from './pages/Company';
-import Home from './pages/Home';
-import LoginForm from './pages/LoginForm';
-import PBI from './pages/PBI';
-import Project from './pages/Project';
+import InfoPage from './pages/InfoPage';
 import AuthProvider from './providers/AuthProvider';
+import PrivateRoute from './routes/PrivateRoute';
+import PublicRoute from './routes/PublicRoute';
+
+// Lazy load pages for better performance
+const LoginForm = React.lazy(() => import('./pages/LoginForm'));
+const Home = React.lazy(() => import('./pages/Home'));
+const Company = React.lazy(() => import('./pages/Company'));
+const Project = React.lazy(() => import('./pages/Project'));
+const PBI = React.lazy(() => import('./pages/PBI'));
 
 function App() {
   return (
     <AuthProvider>
       <Router>
-        <Routes>
-          <Route
-            path="/"
-            element={
-              <PublicRoute>
-                <LoginForm />
-              </PublicRoute>
-            }
-          />
-          <Route
-            path="/home"
-            element={
-              <PrivateRoute>
-                <Home />
-              </PrivateRoute>
-            }
-          />
-          <Route
-            path="/company"
-            element={
-              <PrivateRoute>
-                <Company />
-              </PrivateRoute>
-            }
-          />
-          <Route
-            path="/project"
-            element={
-              <PrivateRoute>
-                <Project />
-              </PrivateRoute>
-            }
-          />
-          <Route
-            path="/pbi"
-            element={
-              <PrivateRoute>
-                <PBI />
-              </PrivateRoute>
-            }
-          />
-          <Route path="*" element={<Navigate to="/" />} />
-        </Routes>
+        <Suspense fallback={<div className="text-white">Cargando...</div>}>
+          <Routes>
+            <Route
+              path="/"
+              element={
+                <PublicRoute>
+                  <LoginForm />
+                </PublicRoute>
+              }
+            />
+            <Route
+              path="/home"
+              element={
+                <PrivateRoute>
+                  <Home />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="/company"
+              element={
+                <PrivateRoute>
+                  <InfoPage type="company" />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="/project"
+              element={
+                <PrivateRoute>
+                  <InfoPage type="project" />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="/pbi"
+              element={
+                <PrivateRoute>
+                  <PBI />
+                </PrivateRoute>
+              }
+            />
+            <Route path="*" element={<Navigate to="/" />} />
+          </Routes>
+        </Suspense>
       </Router>
     </AuthProvider>
   );
-}
-
-function PrivateRoute({ children }: { children: JSX.Element }) {
-  const authContext = React.useContext(AuthContext);
-
-  if (authContext === null) {
-    // Render the loading spinner while loading
-    return null;
-  }
-
-  return authContext.isAuthenticated ? children : <Navigate to="/" />;
-}
-
-function PublicRoute({ children }: { children: JSX.Element }) {
-  const authContext = React.useContext(AuthContext);
-
-  if (authContext === null) {
-    // Render the loading spinner while loading
-    return null;
-  }
-
-  return authContext.isAuthenticated ? <Navigate to="/home" /> : children;
 }
 
 export default App;

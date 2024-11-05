@@ -1,6 +1,14 @@
 // src/providers/AuthProvider.tsx
 import { ReactNode, useEffect, useState } from 'react';
-import AuthContext, { AuthContextType, ProjectData } from '../contexts/AuthContext';
+import AuthContext from '../contexts/AuthContext';
+import { AuthContextType, ProjectData } from '../types/auth';
+
+const LOCAL_STORAGE_KEYS = {
+  USERNAME: 'username',
+  PBI_ID: 'pbiId',
+  IFRAME_URL: 'iframeUrl',
+  PROJECT_DATA: 'projectData',
+};
 
 interface AuthProviderProps {
   children: ReactNode;
@@ -14,17 +22,17 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
   const [projectData, setProjectData] = useState<ProjectData | null>(null);
 
   useEffect(() => {
-    const storedUsername = localStorage.getItem('username');
-    const storedPbiId = localStorage.getItem('pbiId');
-    const storedIframeUrl = localStorage.getItem('iframeUrl');
-    const storedProjectData = localStorage.getItem('projectData');
+    const storedUsername = localStorage.getItem(LOCAL_STORAGE_KEYS.USERNAME);
+    const storedPbiId = localStorage.getItem(LOCAL_STORAGE_KEYS.PBI_ID);
+    const storedIframeUrl = localStorage.getItem(LOCAL_STORAGE_KEYS.IFRAME_URL);
+    const storedProjectData = localStorage.getItem(LOCAL_STORAGE_KEYS.PROJECT_DATA);
 
-    if (storedUsername && storedPbiId && storedIframeUrl && storedProjectData) {
+    if (storedUsername && storedPbiId && storedIframeUrl) {
       setIsAuthenticated(true);
       setUsername(storedUsername);
       setPbiId(storedPbiId);
       setIframeUrl(storedIframeUrl);
-      setProjectData(JSON.parse(storedProjectData));
+      setProjectData(storedProjectData ? JSON.parse(storedProjectData) : null);
     }
   }, []);
 
@@ -34,10 +42,14 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
     iframeUrl: string,
     projectData?: ProjectData
   ) => {
-    localStorage.setItem('username', username);
-    localStorage.setItem('pbiId', pbiId);
-    localStorage.setItem('iframeUrl', iframeUrl);
-    localStorage.setItem('projectData', JSON.stringify(projectData));
+    localStorage.setItem(LOCAL_STORAGE_KEYS.USERNAME, username);
+    localStorage.setItem(LOCAL_STORAGE_KEYS.PBI_ID, pbiId);
+    localStorage.setItem(LOCAL_STORAGE_KEYS.IFRAME_URL, iframeUrl);
+    if (projectData) {
+      localStorage.setItem(LOCAL_STORAGE_KEYS.PROJECT_DATA, JSON.stringify(projectData));
+    } else {
+      localStorage.removeItem(LOCAL_STORAGE_KEYS.PROJECT_DATA);
+    }
     setIsAuthenticated(true);
     setUsername(username);
     setPbiId(pbiId);
@@ -45,12 +57,8 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
     setProjectData(projectData || null);
   };
 
-
   const logout = () => {
-    localStorage.removeItem('username');
-    localStorage.removeItem('pbiId');
-    localStorage.removeItem('iframeUrl');
-    localStorage.removeItem('projectData');
+    Object.values(LOCAL_STORAGE_KEYS).forEach((key) => localStorage.removeItem(key));
     setIsAuthenticated(false);
     setUsername('');
     setPbiId('');
@@ -59,8 +67,8 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
   };
 
   const updatePbi = (pbiId: string, iframeUrl: string) => {
-    localStorage.setItem('pbiId', pbiId);
-    localStorage.setItem('iframeUrl', iframeUrl);
+    localStorage.setItem(LOCAL_STORAGE_KEYS.PBI_ID, pbiId);
+    localStorage.setItem(LOCAL_STORAGE_KEYS.IFRAME_URL, iframeUrl);
     setPbiId(pbiId);
     setIframeUrl(iframeUrl);
   };
@@ -76,11 +84,7 @@ const AuthProvider = ({ children }: AuthProviderProps) => {
     updatePbi,
   };
 
-  return (
-    <AuthContext.Provider value={authContextValue}>
-      {children}
-    </AuthContext.Provider>
-  );
+  return <AuthContext.Provider value={authContextValue}>{children}</AuthContext.Provider>;
 };
 
 export default AuthProvider;

@@ -8,10 +8,11 @@ import { unassign, updatePbiStatus } from '../services/api';
 
 function Home() {
   const [isPullRequestModalVisible, setIsPullRequestModalVisible] = useState(false);
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const authContext = useContext(AuthContext);
 
-  const { username, pbiId, iframeUrl, projectData } = authContext || {};
+  const { username, pbiId, iframeUrl } = authContext || {};
 
   const handleComplete = () => {
     setIsPullRequestModalVisible(true);
@@ -20,10 +21,14 @@ function Home() {
   const handlePullRequestSubmit = async (link: string) => {
     if (pbiId) {
       try {
+        setLoading(true);
         await updatePbiStatus({ pbiId, status: 'in review', urlPR: link });
         setIsPullRequestModalVisible(false);
       } catch (error) {
         console.error('Error submitting pull request link:', error);
+      }
+      finally {
+        setLoading(false);
       }
     } else {
       console.error('pbiId is not available in the auth context');
@@ -35,13 +40,18 @@ function Home() {
   };
 
   const handleAbandon = async () => {
+    console.log('clicked')
     if (username && pbiId) {
       try {
+        setLoading(true);
         await unassign({ username, pbiId });
         authContext?.logout();
         navigate('/');
       } catch (error) {
         console.error('Error abandoning project:', error);
+      }
+      finally {
+        setLoading(true);
       }
     } else {
       console.error('Username and pbiId are not available in the auth context');
@@ -49,11 +59,11 @@ function Home() {
   };
 
   return (
-    <div className="min-h-screen bg-primary p-8 relative">
+    <div className={`min-h-screen bg-primary p-8 relative ${loading ? 'cursor-wait' : 'cursor-default'}`}>
 
       {isPullRequestModalVisible && (
         <PullRequestModal
-          onSubmit={handlePullRequestSubmit}
+          onSubmit={!loading ? () => handlePullRequestSubmit : () => { }}
           onCancel={handlePullRequestCancel}
         />
       )}
@@ -71,7 +81,7 @@ function Home() {
         target='_blank'
       >
         <FaDiscord className="mr-2" />
-        Ir a la comunidad de {projectData?.projectName}
+        Ir a la comunidad del proyecto
       </a>
 
       <button
@@ -91,7 +101,7 @@ function Home() {
       </div>
 
       <button
-        onClick={handleAbandon}
+        onClick={!loading ? () => handleAbandon() : () => { }}
         className="absolute bottom-4 left-8 border-2 border-red-500 text-white px-4 py-2 rounded hover:bg-red-900 focus:outline-none focus:ring-2 focus:ring-red-400 flex items-center whitespace-nowrap"
       >
         <FaTrashAlt className="mr-2" />

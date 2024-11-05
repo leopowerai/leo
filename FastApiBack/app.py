@@ -21,6 +21,7 @@ async def lifespan(app: FastAPI):
     app.project_assigner = await preload_projects(
         app.notion_handler
     )  # This works in spite of MyPy error
+    await app.notion_handler.close()
 
     yield
     # Shutdown code
@@ -167,14 +168,23 @@ async def assign(request: Request):
 
         # Assign the student to the PBI
         success, result = await notion_handler.update_pbi(
-            pbi_id, owners=[student_username], status="in progress"
+            pbi_id,
+            owners=[student_username],
+            status="in progress",
+            update_due_date=True
         )
 
         await notion_handler.close()
 
+        f_pbi_id = remove_char(pbi_id, "-")
+
+        project_id = result['properties']['projects_test']['relation'][0]['id']
+        f_proj_id = remove_char(project_id, "-")
+
         if success:
             response_dict = {
-                "message": f"Estudiante {student_username} asignado exitosamente"
+                "message": f"Estudiante {student_username} asignado exitosamente",
+                "iframeUrl": f"https://v2-embednotion.com/theffs/{f_proj_id}?p={f_pbi_id}&pm=s"
             }
             return JSONResponse(content=response_dict, status_code=200)
         else:
@@ -236,13 +246,13 @@ async def update_pbi_status(request: Request):
     pbi_status = data.get(
         "status"
     )  # Status can be "open", "in progress", "in review", or "done"
-    url_pr = data.get("urlPR") or None
+    results_url = data.get("resultsURL") or None
 
     try:
         # Call the function to update the PBI in Notion
         notion_handler = NotionHandler()
         success, result = await notion_handler.update_pbi(
-            pbi_id, status=pbi_status, url_pr=url_pr
+            pbi_id, status=pbi_status, results_url=results_url
         )
         await notion_handler.close()
 
