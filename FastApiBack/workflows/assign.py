@@ -2,20 +2,22 @@
 
 import logging
 
-from utils import remove_char
 from notion_connector.notion_handler import NotionHandler
 from pbi_assignation.pbi_entities import PBIAssigner, ProductBacklogItem
 from profile_generation.profile_entities import Student
 from project_assignation.project_entities import Project, ProjectAssigner
+from utils import remove_char
 
 
 # TODO: This func should be split into two functions (one for the project assigner and one for the PBI assigner)
-async def assign_project_and_pbi(notion_handler: NotionHandler,
-                                 project_assigner: ProjectAssigner,
-                                 platzi_url, 
-                                 github_url,
-                                 recommended_pbis_count = 1):
-    
+async def assign_project_and_pbi(
+    notion_handler: NotionHandler,
+    project_assigner: ProjectAssigner,
+    platzi_url,
+    github_url,
+    recommended_pbis_count=1,
+):
+
     logging.info("Assign workflow started")
 
     notion_handler.open_session()
@@ -47,7 +49,7 @@ async def assign_project_and_pbi(notion_handler: NotionHandler,
         logging.info(f"Assigning project to student {student.platzi_username}")
 
         recommended_projects, course_embeddings = (
-            project_assigner.find_matching_projects(student)
+            await project_assigner.find_matching_projects(student)
         )
 
         if not recommended_projects or not course_embeddings:
@@ -56,11 +58,10 @@ async def assign_project_and_pbi(notion_handler: NotionHandler,
             response_dict = {"message": no_project_text}
             response_code = 400
             return response_dict, response_code
-        
+
         # AQUI PODRIAMOS SUGERIR VARIOS PROYECTOS
         selected_project = max(recommended_projects, key=lambda x: x[1])[0]
         logging.info(f"Proyecto recomendado: {selected_project.name}")
-        
 
         # Read PBIs for the selected project
         logging.info(f"Reading PBIs for project {selected_project.id}")
@@ -80,20 +81,20 @@ async def assign_project_and_pbi(notion_handler: NotionHandler,
 
         # str_pbis = [(pbi[0].title, pbi[1]) for pbi in scored_pbis]
         # logging.info(f"PBIs scored: {str_pbis}")
-        if (len(scored_pbis) == 0):
+        if len(scored_pbis) == 0:
             message = "No se encontraron PBIs recomendados"
             logging.info(message)
             response_dict = {"message": message}
             response_code = 400
             return response_dict, response_code
-        
+
         # selected_pbi = max(recommended_pbis, key=lambda x: x[1])[0]
         # print(f"Recommended PBI: {recommended_pbis[0][0].title}")
         # print(f"Recommended PBI: {recommended_pbis[1][0].title}")
         # print(f"Recommended PBI: {recommended_pbis[2][0].title}")
-        if (recommended_pbis_count > len(scored_pbis)):
+        if recommended_pbis_count > len(scored_pbis):
             recommended_pbis_count = len(scored_pbis)
-        
+
         recommended_pbis = []
         for i in range(recommended_pbis_count):
             rec_pbi = {
@@ -101,7 +102,7 @@ async def assign_project_and_pbi(notion_handler: NotionHandler,
                 "pbiTitle": scored_pbis[i][0].title,
                 "pbiDescription": scored_pbis[i][0].description,
                 "pbiSkills": scored_pbis[i][0].skills,
-                "pbiScore": scored_pbis[i][1]*100
+                "pbiScore": scored_pbis[i][1] * 100,
             }
             recommended_pbis.append(rec_pbi)
 
@@ -122,7 +123,7 @@ async def assign_project_and_pbi(notion_handler: NotionHandler,
             "projectTechnicalContext": selected_project.technical_context,
             "companyName": selected_project.company_name,
             "companyContext": selected_project.company_context,
-            "suggestedPbis": [dict(pbi) for pbi in recommended_pbis]
+            "suggestedPbis": [dict(pbi) for pbi in recommended_pbis],
             # "iframeUrl": f"https://v2-embednotion.com/theffs/{f_project_id}?p={f_pbi_id}&pm=s",
         }
         response_code = 200

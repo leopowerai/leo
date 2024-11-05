@@ -1,34 +1,30 @@
 import asyncio
 import datetime
 import json
+import logging
 import os
-from config import settings
+
 import aiohttp
+from config import settings
+from redis.asyncio import Redis
 
 NOTION_API_KEY = settings.NOTION_API_KEY
 NOTION_PROJECT_DATABASE_ID = settings.NOTION_PROJECT_DATABASE_ID
 NOTION_VERSION = "2022-06-28"
 
-CACHE_FILE = "notion_projects_cache.json"
-CACHE_EXPIRY_HOURS = 24  # Adjust cache duration as needed
+redis = Redis(host="localhost", port=6379, db=0, decode_responses=False)
+
 
 async def read_notion_projects(session):
-    # Check if cached data exists and is recent
-    if os.path.exists(CACHE_FILE):
-        try:
-            with open(CACHE_FILE, "r") as f:
-                cached_data = json.load(f)
-                cache_timestamp = datetime.datetime.fromisoformat(cached_data.get("timestamp", ""))
-                
-                # If cache is still valid, return cached projects
-                if datetime.datetime.now() - cache_timestamp < datetime.timedelta(hours=CACHE_EXPIRY_HOURS):
-                    return cached_data["projects"]
-                
-        except (json.JSONDecodeError, ValueError):  # Handle empty or corrupted cache file
-            print("Cache file is empty or corrupted. Fetching new data...")
-            os.remove(CACHE_FILE)  # Remove the corrupted cache file to allow fresh fetching
 
-    # If no valid cache, fetch from Notion API
+    cache_key = "notion_projects"
+    try:
+        cached_data = await redis.get(cache_key)
+        if cached_data:
+            return json.loads(cached_data)
+    except Exception as e:
+        logging.warning(f"Redis error: {e}")
+
     url = f"https://api.notion.com/v1/databases/{NOTION_PROJECT_DATABASE_ID}/query"
     headers = {
         "Authorization": f"Bearer {NOTION_API_KEY}",
@@ -47,11 +43,14 @@ async def read_notion_projects(session):
         if response.status == 200:
             data = await response.json()
             projects = data.get("results", [])
-            
-            # Save the new data to cache
-            with open(CACHE_FILE, "w") as f:
-                json.dump({"timestamp": datetime.datetime.now().isoformat(), "projects": projects}, f)
-                
+
+            # Cache the projects in Redis with an expiry time (e.g., 24 hours)
+            try:
+                await redis.set(cache_key, json.dumps(projects), ex=86400)
+            except Exception as e:
+                logging.warning(f"Redis error: {e}")
+                # Proceed without caching if Redis is unavailable
+
             return projects
         else:
             error_text = await response.text()

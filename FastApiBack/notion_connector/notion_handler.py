@@ -1,24 +1,31 @@
 # notion_handler.py
 
+import logging
+
 import aiohttp
 from db_handler import BaseDBHandler
-from pbi_assignation.pbi_entities import Status
-from notion_connector.read_pbis import read_notion_pbis_for_project, get_filtered_pbis_for_student
+from notion_connector.read_pbis import (
+    get_filtered_pbis_for_student,
+    read_notion_pbis_for_project,
+)
 from notion_connector.read_projects import read_notion_projects
 from notion_connector.update_pbi import update_notion_pbi
+from pbi_assignation.pbi_entities import Status
+from redis.asyncio import Redis
+
 
 class NotionHandler(BaseDBHandler):
     def __init__(self):
-        super().__init__()
-        # self.session = aiohttp.ClientSession()
-        self.session = self.open_session()
-    
+        self.session = aiohttp.ClientSession()
+        self.redis = Redis(host="localhost", port=6379, db=0, decode_responses=False)
+
     def open_session(self):
         self.session = aiohttp.ClientSession()
         return self.session
 
     async def close(self):
         await self.session.close()
+        await self.redis.close()
 
     async def create_pbi(self, **kwargs):
         """
@@ -34,7 +41,9 @@ class NotionHandler(BaseDBHandler):
 
     async def read_projects(self):
         notion_projects = await read_notion_projects(self.session)
-        formatted_projects = [self._extract_project_info(project) for project in notion_projects]
+        formatted_projects = [
+            self._extract_project_info(project) for project in notion_projects
+        ]
         return formatted_projects
 
     async def read_pbis(self, project_id):
@@ -53,23 +62,37 @@ class NotionHandler(BaseDBHandler):
 
         # Extract the project name
         project_name_prop = project.get("properties", {}).get("project_name", {})
-        project_name = project_name_prop.get("title", [{}])[0].get("plain_text", "No Name found")
+        project_name = project_name_prop.get("title", [{}])[0].get(
+            "plain_text", "No Name found"
+        )
 
         # Extract the company name (or default if not found)
         company_prop = project.get("properties", {}).get("company_name", {})
-        company_name = company_prop.get("rich_text", [{}])[0].get("plain_text", "The Chill Company")
+        company_name = company_prop.get("rich_text", [{}])[0].get(
+            "plain_text", "The Chill Company"
+        )
 
         # Extract the business context
-        business_context_prop = project.get("properties", {}).get("business_context", {})
-        business_context = business_context_prop.get("rich_text", [{}])[0].get("plain_text", "")
+        business_context_prop = project.get("properties", {}).get(
+            "business_context", {}
+        )
+        business_context = business_context_prop.get("rich_text", [{}])[0].get(
+            "plain_text", ""
+        )
 
         # Extract the technical context
-        technical_context_prop = project.get("properties", {}).get("technical_context", {})
-        technical_context = technical_context_prop.get("rich_text", [{}])[0].get("plain_text", "")
+        technical_context_prop = project.get("properties", {}).get(
+            "technical_context", {}
+        )
+        technical_context = technical_context_prop.get("rich_text", [{}])[0].get(
+            "plain_text", ""
+        )
 
         # Extract the company context
         company_context_prop = project.get("properties", {}).get("company_context", {})
-        company_context = company_context_prop.get("rich_text", [{}])[0].get("plain_text", "")
+        company_context = company_context_prop.get("rich_text", [{}])[0].get(
+            "plain_text", ""
+        )
 
         # Return all required fields
         return (
@@ -79,7 +102,7 @@ class NotionHandler(BaseDBHandler):
             business_context,
             technical_context,
             company_name,
-            company_context
+            company_context,
         )
 
     def _extract_pbi_info(self, pbi_data):
@@ -115,7 +138,9 @@ class NotionHandler(BaseDBHandler):
 
         # Project (relation ID)
         project_relation = (
-            pbi_data.get("properties", {}).get("projects_test", {}).get("relation", [{}])
+            pbi_data.get("properties", {})
+            .get("projects_test", {})
+            .get("relation", [{}])
         )
         project = (
             project_relation[0].get("id", "No Project Linked")
@@ -149,12 +174,11 @@ class NotionHandler(BaseDBHandler):
             return Status(notion_status_str.lower().replace(" ", "_"))
         except ValueError:
             return None  # Or some default Status value if the string doesn't match
-    
 
     async def is_student_assigned_to_open_pbi(self, student_username):
-        assigned_project_id, assigned_pbi_id = await get_filtered_pbis_for_student(self.session, student_username)
+        assigned_project_id, assigned_pbi_id = await get_filtered_pbis_for_student(
+            self.session, student_username
+        )
 
         # If any PBIs are returned, the student is assigned to at least one PBI in those statuses
         return assigned_project_id, assigned_pbi_id
-
-

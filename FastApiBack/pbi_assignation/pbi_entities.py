@@ -1,26 +1,25 @@
+import asyncio
 from enum import Enum
 from typing import List, Optional, Tuple
-from sklearn.metrics.pairwise import cosine_similarity
-
 
 import numpy as np
-
-
 from ai_utils import get_embedding
 from project_assignation.project_entities import Project
+from sklearn.metrics.pairwise import cosine_similarity
+
 
 class Complexity(Enum):
     LOW = "Low"
     MEDIUM = "Medium"
     HIGH = "High"
-    
+
+
 class Status(Enum):
     OPEN = "open"
     IN_PROGRESS = "in progress"
     DONE = "done"
     BLOCKED = "blocked"
     IN_REVIEW = "in review"
-
 
 
 # Update the assign method in ProductBacklogItem
@@ -66,7 +65,7 @@ class ProductBacklogItem:
             print(f"Updated PBI:{self.title}: {result}")
         else:
             print(f"Failed to update PBI: {self.title}")
-            
+
     async def __repr__(self):
         return (
             f"ProductBacklogItem(title={self.title}, ID: {self.id}, description={self.description}, "
@@ -87,7 +86,7 @@ class PBIAssigner:
         for pbi in self.pbis:
             if pbi.status == Status.OPEN and pbi.assigned_to is None:
                 available_pbis.append(pbi)
-        
+
         return available_pbis
 
     async def find_matching_task(self, course_embeddings):
@@ -101,10 +100,12 @@ class PBIAssigner:
 
         # Iterate over each task in the project to calculate similarity scores
         for pbi in self.get_available_pbis():
-            # Generate embeddings for each requirement in the task
-            requirement_embeddings = [get_embedding(
-                tech) for tech in pbi.skills]
-        
+
+            # Create a list of coroutines
+            tasks = [get_embedding(req) for req in pbi.skills]
+            # Run them concurrently
+            requirement_embeddings = await asyncio.gather(*tasks)
+
             # requirement_embeddings.append(get_embedding(pbi.title))
 
             # Calculate similarity scores between each course and each task requirement
