@@ -54,7 +54,7 @@ origins = [
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -171,20 +171,20 @@ async def assign(request: Request):
             pbi_id,
             owners=[student_username],
             status="in progress",
-            update_due_date=True
+            update_due_date=True,
         )
 
         await notion_handler.close()
 
         f_pbi_id = remove_char(pbi_id, "-")
 
-        project_id = result['properties']['projects_test']['relation'][0]['id']
+        project_id = result["properties"]["projects_test"]["relation"][0]["id"]
         f_proj_id = remove_char(project_id, "-")
 
         if success:
             response_dict = {
                 "message": f"Estudiante {student_username} asignado exitosamente",
-                "iframeUrl": f"https://v2-embednotion.com/theffs/{f_proj_id}?p={f_pbi_id}&pm=s"
+                "iframeUrl": f"https://v2-embednotion.com/theffs/{f_proj_id}?p={f_pbi_id}&pm=s",
             }
             return JSONResponse(content=response_dict, status_code=200)
         else:
