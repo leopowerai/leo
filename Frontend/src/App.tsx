@@ -2,7 +2,6 @@
 import React, { Suspense } from 'react';
 import { Navigate, Route, BrowserRouter as Router, Routes } from 'react-router-dom';
 import './App.css';
-import InfoPage from './pages/InfoPage';
 import AuthProvider from './providers/AuthProvider';
 import PrivateRoute from './routes/PrivateRoute';
 import PublicRoute from './routes/PublicRoute';
@@ -10,9 +9,8 @@ import PublicRoute from './routes/PublicRoute';
 // Lazy load pages for better performance
 const LoginForm = React.lazy(() => import('./pages/LoginForm'));
 const Home = React.lazy(() => import('./pages/Home'));
-const Company = React.lazy(() => import('./pages/Company'));
-const Project = React.lazy(() => import('./pages/Project'));
 const PBI = React.lazy(() => import('./pages/PBI'));
+const InfoPage = React.lazy(() => import('./pages/InfoPage'));
 
 function App() {
   return (

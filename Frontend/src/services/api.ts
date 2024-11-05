@@ -1,5 +1,3 @@
-
-// src/services/api.ts
 import axios, { AxiosError } from 'axios';
 
 export class ApiError extends Error {
@@ -12,6 +10,11 @@ export class ApiError extends Error {
   }
 }
 
+// Define the structure of the error response data
+interface ErrorResponse {
+  error?: string;
+}
+
 const apiClient = axios.create({
   baseURL: import.meta.env.VITE_API_URL,
   headers: {
@@ -22,7 +25,8 @@ const apiClient = axios.create({
 apiClient.interceptors.response.use(
   (response) => response,
   (error: AxiosError) => {
-    const message = error.response?.data?.error || error.message || 'Network response was not ok';
+    const message =
+      (error.response?.data as ErrorResponse)?.error || error.message || 'Network response was not ok';
     return Promise.reject(new ApiError(message, error.response?.status));
   }
 );
