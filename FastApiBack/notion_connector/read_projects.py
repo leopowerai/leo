@@ -6,13 +6,11 @@ import os
 
 import aiohttp
 from config import settings
-from redis.asyncio import Redis
+from redis_client import redis
 
 NOTION_API_KEY = settings.NOTION_API_KEY
 NOTION_PROJECT_DATABASE_ID = settings.NOTION_PROJECT_DATABASE_ID
 NOTION_VERSION = "2022-06-28"
-
-redis = Redis(host="localhost", port=6379, db=0, decode_responses=False)
 
 
 async def read_notion_projects(session):

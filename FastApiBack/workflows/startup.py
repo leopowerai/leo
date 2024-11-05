@@ -5,8 +5,9 @@ and calculate the embeddings for the project requirements
 
 import logging
 
-from project_assignation.project_entities import Project, ProjectAssigner
 from notion_connector.notion_handler import NotionHandler
+from project_assignation.project_entities import Project, ProjectAssigner
+
 
 async def preload_projects(notion_handler: NotionHandler) -> ProjectAssigner:
     logging.info("Preloading projects")
@@ -17,7 +18,6 @@ async def preload_projects(notion_handler: NotionHandler) -> ProjectAssigner:
 
     # Calculate embeddings for project requirements
     project_assigner = ProjectAssigner(formatted_projects)
-    project_assigner.calculate_projects_requirements_embeddings()
+    await project_assigner.calculate_projects_requirements_embeddings()
 
     return project_assigner
-    

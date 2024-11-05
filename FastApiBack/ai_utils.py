@@ -3,16 +3,13 @@ import logging
 
 from config import settings
 from openai import AsyncOpenAI
-from redis.asyncio import Redis
+from redis_client import redis
 
 # Set the OpenAI API key
 client = AsyncOpenAI(
     # This is the default and can be omitted
     api_key=settings.OPENAI_KEY,
 )
-
-# Initialize Redis client
-redis = Redis(host="localhost", port=6379, db=0, decode_responses=False)
 
 
 async def get_embedding(text: str, model: str = "text-embedding-3-small") -> list:

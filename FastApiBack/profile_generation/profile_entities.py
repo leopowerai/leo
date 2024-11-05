@@ -10,9 +10,8 @@ from typing import List, Optional, Tuple
 import aiohttp
 from bs4 import BeautifulSoup
 from profile_generation.profile_utils import convert_js_to_json, get_titles_from_courses
-from redis.asyncio import Redis
+from redis_client import redis
 
-redis = Redis(host="localhost", port=6379, db=0, decode_responses=False)
 # from config import settings
 
 # TODO: Student could be a dataclass and there may be a ProfileFetcher class
