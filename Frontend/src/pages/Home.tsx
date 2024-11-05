@@ -19,10 +19,9 @@ function Home() {
   };
 
   const handlePullRequestSubmit = async (link: string) => {
-    if (pbiId) {
       try {
         setLoading(true);
-        await updatePbiStatus({ pbiId, status: 'in review', urlPR: link });
+        await updatePbiStatus({ pbiId: pbiId!, status: 'in review', urlPR: link });
         setIsPullRequestModalVisible(false);
       } catch (error) {
         console.error('Error submitting pull request link:', error);
@@ -30,9 +29,6 @@ function Home() {
       finally {
         setLoading(false);
       }
-    } else {
-      console.error('pbiId is not available in the auth context');
-    }
   };
 
   const handlePullRequestCancel = () => {
@@ -89,7 +85,7 @@ function Home() {
         className="absolute top-4 right-8 bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-400 flex items-center whitespace-nowrap"
       >
         <FaCheck className="mr-2" />
-        Adjuntar Pull Request Link
+        Adjunta tus Resultados
       </button>
 
       <div className="mx-auto mt-10 mb-10">
