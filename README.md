@@ -1,4 +1,69 @@
-<img src='https://i.postimg.cc/1tQWsQ8z/Leo.png' border='0' alt='Leo' border='0'  width ="200" /></a>
+<p align="center"><img src='https://i.postimg.cc/1tQWsQ8z/Leo.png' border='0' alt='Leo' border='0'  width ="200" /></a></p>
+
+**<h1 align="center"></>⚡ Bienvenidos al Poder de LeoPower ⚡</></h1>**
+
+<p align="center">
+  <img src="https://img.shields.io/badge/Misión-Innovar%20%7C%20Transformar%20%7C%20Potenciar-blueviolet" />
+  <img src="https://img.shields.io/badge/Especialidad-Fullstack%20Dev%20%7C%20AI%20%7C%20Cybersecurity-informational" />
+  <img src="https://img.shields.io/badge/Energía-LeoPower-red" />
+</p>
+
+<p align="center">
+  🔥 Somos un equipo dedicado a la innovación tecnológica, combinando desarrollo fullstack e inteligencia artificial 🔥
+</p>
+
+<h1 align="center"></>Conoce al Equipo LeoPower :leopard:</></h1>
+Bienvenidos a la presentación de nuestro equipo. Somos un grupo de cinco Santandereanos. Cada miembro aporta su energía y talento para hacer de LeoPower un equipo imparable. 🚀
+
+<h2 align="center">Nuestro Equipo</h2>
+
+<p align="center">
+<table>
+    <tr>
+      <td align="center">
+        <img src="https://via.placeholder.com/150" width="90" height="90" alt="Miembro 1" style="border-radius: 50%;"><br>
+        <b>Ciro</b><br>
+        <p>"El Couch"</p>
+        in/cirogam
+      </td>
+      <td align="center">
+        <img src="https://via.placeholder.com/150" width="90" height="90" alt="Miembro 2" style="border-radius: 50%;"><br>
+        <b>Juli</b><br>
+        <p>"La Front"</p>
+        in/ju4n1t4
+      </td>
+      <td align="center">
+        <img src="https://via.placeholder.com/150" width="90" height="90" alt="Miembro 3" style="border-radius: 50%;"><br>
+        <b>Álvaro</b><br>
+        <p>"El Profe"</p>
+        in/alvarojhr
+      </td>
+      <td align="center">
+        <img src="https://via.placeholder.com/150" width="90" height="90" alt="Miembro 4" style="border-radius: 50%;"><br>
+        <b>Theff</b><br>
+        <p>"La Marketer"</p>
+        in/theff
+      </td>
+      <td align="center">
+        <img src="https://via.placeholder.com/150" width="90" height="90" alt="Miembro 5" style="border-radius: 50%;"><br>
+        <b>Nico</b><br>
+        <p>"El Pythonista"</p>
+        in/nicolasmorenoy
+      </td>
+  </table>
+</p>
+
+Cada miembro de LeoPower tiene un papel esencial en nuestro equipo. ¡Nos enorgullecemos de nuestra diversidad de habilidades y nuestra misión común de crear un impacto positivo! 💪💥
+
+<p align="center">
+  🚀 Estamos siempre abiertos a colaborar en proyectos.
+</p>
+
+<p align="center">
+  <img alt="Estadísticas de GitHub de cmleopower" src="https://github-readme-stats.vercel.app/api?username=cmleopower&show_icons=true&theme=algolia&include_all_commits=true&count_private=true&border_radius=8&hide_border=true" />
+</p>
+
+<p></p>
 
 <h2>Descripción del Proyecto</h2>
 <p>Lorem ipsum </p>
