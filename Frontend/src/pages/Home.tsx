@@ -1,6 +1,6 @@
 // src/pages/Home.tsx
 import { useContext, useState } from 'react';
-import { FaCheck, FaDiscord, FaTrashAlt } from 'react-icons/fa';
+import { FaCheck, FaTrashAlt, FaWhatsapp } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
 import PullRequestModal from '../components/PullRequestModal';
 import AuthContext from '../contexts/AuthContext';
@@ -76,17 +76,17 @@ function Home() {
       </button> */}
 
       <a
-        href='https://discord.gg/CzHWvWUTdP'
-        className="absolute top-4 left-8 bg-blue-400 text-white px-4 py-2 rounded hover:bg-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-400 flex items-center whitespace-nowrap"
+        href='https://chat.whatsapp.com/EXRWl1tuQ6b0e9uckUqcjw'
+        className="absolute top-4 left-8 bg-green-400 text-white px-4 py-2 rounded hover:bg-green-500 focus:outline-none focus:ring-2 focus:ring-green-400 flex items-center whitespace-nowrap"
         target='_blank'
       >
-        <FaDiscord className="mr-2" />
+        <FaWhatsapp className="mr-2" />
         Ir a la comunidad del proyecto
       </a>
 
       <button
         onClick={handleComplete}
-        className="absolute top-4 right-8 bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-400 flex items-center whitespace-nowrap"
+        className="absolute top-4 right-8 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400 flex items-center whitespace-nowrap"
       >
         <FaCheck className="mr-2" />
         Adjuntar Resultados
