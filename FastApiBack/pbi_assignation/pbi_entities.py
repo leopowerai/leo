@@ -1,6 +1,6 @@
 import asyncio
 from enum import Enum
-from typing import List, Optional, Tuple
+from typing import Any, Dict, List, Optional, Tuple
 
 import numpy as np
 from ai_utils import get_embedding
@@ -91,22 +91,27 @@ class PBIAssigner:
 
     async def find_matching_task(self, course_embeddings):
         """
-        Identify the best matching task within a project based on the courses taken.
+        Identify the best matching tasks (PBIs) within a project based on the student's courses.
         Returns:
-            Tuple[str, float]: The name of the best matching task and its similarity score.
+            List[Tuple[ProductBacklogItem, float]]: The PBIs and their similarity scores.
         """
-        # Store tasks and their match scores
+        available_pbis = self.get_available_pbis()
+
+        # Collect all unique skills from available PBIs
+        all_skills = set()
+        for pbi in available_pbis:
+            all_skills.update(pbi.skills)
+        all_skills = list(all_skills)
+
+        # Fetch embeddings for all unique skills in batch
+        skill_embeddings = await get_embedding(all_skills)
+        skill_to_embedding = dict(zip(all_skills, skill_embeddings))
+
         pbi_scores = []
 
-        # Iterate over each task in the project to calculate similarity scores
-        for pbi in self.get_available_pbis():
-
-            # Create a list of coroutines
-            tasks = [get_embedding(req) for req in pbi.skills]
-            # Run them concurrently
-            requirement_embeddings = await asyncio.gather(*tasks)
-
-            # requirement_embeddings.append(get_embedding(pbi.title))
+        for pbi in available_pbis:
+            # Get embeddings for the PBI's skills from the mapping
+            requirement_embeddings = [skill_to_embedding[skill] for skill in pbi.skills]
 
             # Calculate similarity scores between each course and each task requirement
             scores = [
@@ -116,12 +121,10 @@ class PBIAssigner:
             ]
 
             # Compute the average similarity score for the task
-            avg_score = np.mean(scores)
+            avg_score = np.mean(scores) if scores else 0
             pbi_scores.append((pbi, avg_score))
 
-        # Find the task with the highest similarity score
-        # best_pbis = max(pbi_scores, key=lambda x: x[1])
-
+        # Sort PBIs by their match score in descending order
         pbi_scores.sort(key=lambda x: x[1], reverse=True)
 
         return pbi_scores

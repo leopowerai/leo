@@ -12,25 +12,49 @@ client = AsyncOpenAI(
 )
 
 
-async def get_embedding(text: str, model: str = "text-embedding-3-small") -> list:
-    cache_key = f"embedding:{text}"
-    # Try to get the embedding from Redis
-    try:
-        cached_embedding = await redis.get(cache_key)
-        if cached_embedding:
-            # Deserialize the cached embedding
-            return json.loads(cached_embedding)
-    except Exception as e:
-        logging.warning(f"Redis error: {e}")
+async def get_embedding(texts: str, model: str = "text-embedding-3-small") -> list:
+    """
+    Fetch embeddings for a single text or a list of texts.
+    """
+    if isinstance(texts, str):
+        texts = [texts]
+    cache_keys = [f"embedding:{text}" for text in texts]
+    embeddings = []
+    texts_to_fetch = []
+    indices_to_fetch = []
 
-    response = await client.embeddings.create(input=[text], model=model)
-    embedding = response.data[0].embedding
+    # Check cache for existing embeddings
+    for i, (text, key) in enumerate(zip(texts, cache_keys)):
+        try:
+            cached_embedding = await redis.get(key)
+            if cached_embedding:
+                embeddings.append(json.loads(cached_embedding))
+            else:
+                embeddings.append(None)
+                texts_to_fetch.append(text)
+                indices_to_fetch.append(i)
+        except Exception as e:
+            logging.warning(f"Redis error: {e}")
+            embeddings.append(None)
+            texts_to_fetch.append(text)
+            indices_to_fetch.append(i)
 
-    # Cache the embedding in Redis
-    try:
-        await redis.set(cache_key, json.dumps(embedding))
-    except Exception as e:
-        logging.warning(f"Redis error: {e}")
-        # Proceed without caching if Redis is unavailable
+    # Fetch embeddings for texts not in cache
+    if texts_to_fetch:
+        try:
+            response = await client.embeddings.create(input=texts_to_fetch, model=model)
+            fetched_embeddings = [item.embedding for item in response.data]
 
-    return embedding
+            # Cache fetched embeddings
+            for idx, embedding in zip(indices_to_fetch, fetched_embeddings):
+                embeddings[idx] = embedding
+                cache_key = cache_keys[idx]
+                try:
+                    await redis.set(cache_key, json.dumps(embedding))
+                except Exception as e:
+                    logging.warning(f"Redis error when caching: {e}")
+        except Exception as e:
+            logging.error(f"Error fetching embeddings from OpenAI: {e}")
+            raise
+
+    return embeddings if len(embeddings) > 1 else embeddings[0]

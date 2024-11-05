@@ -1,4 +1,5 @@
-import asyncio  # Import asyncio
+# project_entities.py
+import asyncio
 from dataclasses import dataclass
 from typing import Any, Dict, List, Tuple
 
@@ -25,28 +26,31 @@ class ProjectAssigner:
         self.requirements_embeddings_list: Dict[str, List[List[Any]]] = {}
 
     async def calculate_projects_requirements_embeddings(self) -> None:
-        requirement_embeddings_list = {}
+        # Collect all unique skills
+        all_skills = set()
         for project in self.projects:
-            # Create a list of coroutines for get_embedding
-            tasks = [get_embedding(req) for req in project.skills]
-            # Run the coroutines concurrently
-            requirement_embeddings = await asyncio.gather(*tasks)
-            requirement_embeddings_list[project.name] = requirement_embeddings
-        self.requirements_embeddings_list = requirement_embeddings_list
+            all_skills.update(project.skills)
+        all_skills = list(all_skills)
+
+        # Fetch embeddings in batch
+        skill_embeddings = await get_embedding(all_skills)
+
+        # Map skills to embeddings
+        skill_to_embedding = dict(zip(all_skills, skill_embeddings))
+
+        # Build the requirements embeddings list for each project
+        for project in self.projects:
+            requirement_embeddings = [
+                skill_to_embedding[skill] for skill in project.skills
+            ]
+            self.requirements_embeddings_list[project.name] = requirement_embeddings
 
     async def find_matching_projects(self, student: Student):
-        """
-        Identify projects that best match the provided courses based on cosine similarity.
-
-        Returns:
-            List[Tuple[Project, float]]: Sorted list of projects with their average similarity scores.
-        """
         if not self.requirements_embeddings_list:
             await self.calculate_projects_requirements_embeddings()
 
-        # Generate embeddings for each course
-        course_tasks = [get_embedding(course) for course in student.courses]
-        course_embeddings = await asyncio.gather(*course_tasks)
+        # Fetch course embeddings in batch
+        course_embeddings = await get_embedding(student.courses)
 
         project_scores = []
 
